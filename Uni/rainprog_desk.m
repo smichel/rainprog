@@ -4,7 +4,7 @@ filepath='D:/Programmieren/Rain/m4t_BKM_wrx00_l2_dbz_v00_20130511160000.nc';
 data=ncread(filepath,'dbz_ac1');
 azi=ncread(filepath,'azi');
 range=ncread(filepath,'range');
- 
+
 % 
 % for i=1:size(data,3)
 %     figure
@@ -101,8 +101,8 @@ max_=max(max(max(dataRain(:,:,:))));
 %%%%%%%%%%%%%%%%%%%%
 
 %cartesian coordinatesystem
-x_car = -20000:100:20000;
-y_car = -20000:100:20000;
+x_car = -20000:200:20000;
+y_car = -20000:200:20000;
 [X,Y]= meshgrid(x_car,y_car);
 
 
@@ -154,14 +154,19 @@ o=0;
 Contours=[0.1 0.2 0.5 1 2 5 10 100];
 
 for i=1:timesteps-1
-    if nested_data(c_max{i}(1),c_max{i}(2),i) - mean([nested_data(c_max{i}(1),c_max{i}(2),i),nested_data(c_max{i}(1)+1,c_max{i}(2),i),nested_data(c_max{i}(1)+1,c_max{i}(2)+1,i),nested_data(c_max{i}(1)-1,c_max{i}(2),i),nested_data(c_max{i}(1)-1,c_max{i}(2)-1,i)]) > 0.1 %& nested_data(c_max{i}(1),c_max{i}(2),i) == 0
-        c_max{i}=maxima{i}(2:-1:1);
-        warning('chose new maximum')
-        o=o+1;
+    if i ~=1
+        if c_max{i}(1) == c_max{i-1}(1) & c_max{i}(2) == c_max{i-1}(2) | ...
+            nested_data(c_max{i}(1),c_max{i}(2),i) - mean([nested_data(c_max{i}(1),c_max{i}(2),i),nested_data(c_max{i}(1)+1,c_max{i}(2),i),nested_data(c_max{i}(1)+1,c_max{i}(2)+1,i),nested_data(c_max{i}(1)-1,c_max{i}(2),i),nested_data(c_max{i}(1)-1,c_max{i}(2)-1,i)]) > 0.1 ...%& nested_data(c_max{i}(1),c_max{i}(2),i) - mean([nested_data(c_max{i}(1),c_max{i}(2),i),nested_data(c_max{i}(1)+1,c_max{i}(2),i),nested_data(c_max{i}(1)+1,c_max{i}(2)+1,i),nested_data(c_max{i}(1)-1,c_max{i}(2),i),nested_data(c_max{i}(1)-1,c_max{i}(2)-1,i)]) < 0.01
+            | nested_data(c_max{i}(1),c_max{i}(2),i) == 0
+            c_max{i}=maxima{i}(2:-1:1); 
+            warning('chose new maximum')
+            o=o+1;
+        end
     end
     corr_area=nested_data((c_max{i}(2)-c_range):(c_max{i}(2)+c_range),(c_max{i}(1)-c_range):(c_max{i}(1)+c_range),i);
-    C=xcorr2(nested_data(:,:,i+1),corr_area);
-    [ssr,snd]=max(C(:));
+%     C=xcorr2(nested_data(:,:,i+1),corr_area);
+    C=LeastSquareCorr(nested_data(:,:,i+1),corr_area);
+    [ssr,snd]=min(C(:));
     [y_,x_]=ind2sub(size(C),snd);
     c_max{i+1}(1)=x_-c_range;
     c_max{i+1}(2)=y_-c_range;
@@ -174,8 +179,31 @@ for i=1:timesteps-1
     plot(c_max{i}(1),c_max{i}(2),'go','MarkerSize',20,'MarkerFaceColor','g')
     plot(c_max{i+1}(1),c_max{i+1}(2),'bo','MarkerSize',20,'MarkerFaceColor','b')
     line([c_max{i+1}(1) c_max{i}(1) ],[c_max{i+1}(2) c_max{i}(2)],'LineWidth',5,'Color','k')
-    %plot(maxima{i}(2),maxima{i}(1),'ko','MarkerSize',20,'MarkerFaceColor','k')
-    pause(0.5)
+    plot(maxima{i}(2),maxima{i}(1),'ko','MarkerSize',20,'MarkerFaceColor','k')
+    pause(0.1)
     hold off
+
+end
+
+function[c_d]=LeastSquareCorr(d,c)
+%Calculates a leastsquare correlation between 2 matrices c and d
+
+c_l=length(c);
+d_l=length(d);
+
+c_d=zeros(d_l+c_l-1,d_l+c_l-1);
+corr=ones(d_l+2*c_l-2,d_l+2*c_l-2)*999999;
+corr(c_l:d_l+c_l-1,c_l:d_l+c_l-1)=d;
+
+
+k=1;m=1;
+for i=1:d_l+c_l-1
+    for j=1:d_l+c_l-1
+        c_d(k,m)=sum(sum((corr(i:i+c_l-1,j:j+c_l-1)-c).^2));
+        m=m+1;
+    end
+    m=1;
+    k=k+1;
+end
 
 end
