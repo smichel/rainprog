@@ -31,9 +31,11 @@ d_s=length(X);
 
 %preallocating
 data_car=cell(timesteps,1);
-maxima=cell(timesteps,1);
+maxima=cell(timesteps,4,1);
 c_max=cell(timesteps,1);
 nested_data= zeros(d_s+2*c_range,d_s+2*c_range,timesteps);
+max_x=zeros(1,4);
+max_y=zeros(1,4);
 
 %transformation from polar to cartesian
 for i=1:timesteps
@@ -42,9 +44,9 @@ for i=1:timesteps
     data_car{i}= griddata(x,y,data(:,:,i),X,Y);
     %data_car{i}=0.0364633*(10^(data_car{i}/10))^0.625;
     toc
-
+    
 end
-    %setting nans to 0
+%setting nans to 0
 for i=1:timesteps
     for j=1:length(data_car{i})
         for o=1:length(data_car{i})
@@ -53,13 +55,45 @@ for i=1:timesteps
             end
         end
     end
-
+    
     nested_data(c_range+1:c_range+d_s,c_range+1:c_range+d_s,i)= data_car{i};
-    [val, max_y]=max(max(nested_data(:,:,i)));
-	[val, max_x]=max(nested_data(:,max_y,i));
-    maxima{i}(1)=max_x;
-    maxima{i}(2)=max_y;
-    maxima{i}(3)=mean([nested_data(max_x,max_y,i),nested_data(max_x+1,max_y,i),nested_data(max_x+1,max_y+1,i),nested_data(max_x-1,max_y,i),nested_data(max_x-1,max_y-1,i)]);
+    d_n=length(nested_data);
+    for q = 1:4
+        if q == 1
+            x_q_s=((d_n-1)/2)+1;
+            x_q_e=d_n;
+            y_q_s=((d_n-1)/2)+1;
+            y_q_e=d_n;
+        elseif q==2
+            x_q_s=1;
+            x_q_e=((d_n-1)/2);
+            y_q_s=((d_n-1)/2)+1;
+            y_q_e=d_n;
+        elseif q==3
+            x_q_s=1;
+            x_q_e=((d_n-1)/2);
+            y_q_s=1;
+            y_q_e=((d_n-1)/2);
+        elseif q==4
+            x_q_s=((d_n-1)/2)+1;
+            x_q_e=d_n;
+            y_q_s=1;
+            y_q_e=((d_n-1)/2);
+        end
+        [~, max_y(q)]=max(max(nested_data(x_q_s:x_q_e,y_q_s:y_q_e,i)));
+        if q == 1 | q == 2
+            max_y(q)=max_y(q)+((d_n-1)/2);
+        end
+        [~, max_x(q)]=max(nested_data(x_q_s:x_q_e,max_y(q),i));
+        if q == 1 | q == 4
+            max_x(q)=max_x(q)+((d_n-1)/2);
+        end
+    end
+    maxima{i}(1:4,1)=max_x;
+    maxima{i}(1:4,2)=max_y;
+    for q=1:4
+        maxima{i}(q,3)=mean([nested_data(max_x(q),max_y(q),i),nested_data(max_x(q)+1,max_y(q),i),nested_data(max_x(q)+1,max_y(q)+1,i),nested_data(max_x(q)-1,max_y(q),i),nested_data(max_x(q)-1,max_y(q)-1,i)]);
+    end
 end
 
 %nesting the array into a bigger array
