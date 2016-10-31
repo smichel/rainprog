@@ -1,4 +1,10 @@
 close all;clear;
+%Variables
+%Gridvars:
+res=200;%horizontal resolution - e.g. 200m
+timesteps=120;
+
+
 
 filepath='E:/Rainprog/m4t_BKM_wrx00_l2_dbz_v00_20130511160000.nc';
 data=ncread(filepath,'dbz_ac1');
@@ -20,12 +26,11 @@ end
 
 
 %cartesian coordinatesystem
-x_car = -20000:100:20000;
-y_car = -20000:100:20000;
+x_car = -20000:res:20000;
+y_car = -20000:res:20000;
 [X,Y]= meshgrid(x_car,y_car);
 
 
-timesteps=120;
 c_range=floor((length(X)-1)/12);
 d_s=length(X);
 
@@ -35,7 +40,7 @@ maxima=cell(timesteps,1);
 c_max=cell(timesteps,1);
 nested_data= zeros(d_s+2*c_range,d_s+2*c_range,timesteps);
 for i = 1:timesteps
-    maxima{i}=zeros(1,4);
+    maxima{i}=zeros(1,3);
 end
 max_x=zeros(1,4);
 max_y=zeros(1,4);
@@ -110,44 +115,57 @@ o=0;
 Contours=[0.1 0.2 0.5 1 2 5 10 100];
 figure(1)
 filename='lqcorr2_4q.gif';
-gif=1;
+gif=0;
 l_len=zeros(120,1);
 l_alpha=zeros(120,1);
 for i=1:timesteps-1
-    for q=1:4
-    tic
-    if i ~=1
-        if c_max{i}(q,1) == c_max{i-1}(q,1) & c_max{i}(q,2) == c_max{i-1}(q,2) | ...
-            nested_data(c_max{i}(q,1),c_max{i}(q,2),i) - mean([nested_data(c_max{i}(q,1),c_max{i}(q,2),i),nested_data(c_max{i}(q,1)+1,c_max{i}(q,2),i),nested_data(c_max{i}(q,1)+1,c_max{i}(q,2)+1,i),nested_data(c_max{i}(q,1)-1,c_max{i}(q,2),i),nested_data(c_max{i}(q,1)-1,c_max{i}(q,2)-1,i)]) > 0.1 ...%& nested_data(c_max{i}(1),c_max{i}(2),i) - mean([nested_data(c_max{i}(1),c_max{i}(2),i),nested_data(c_max{i}(1)+1,c_max{i}(2),i),nested_data(c_max{i}(1)+1,c_max{i}(2)+1,i),nested_data(c_max{i}(1)-1,c_max{i}(2),i),nested_data(c_max{i}(1)-1,c_max{i}(2)-1,i)]) < 0.01
-            | nested_data(c_max{i}(q,1),c_max{i}(q,2),i) == 0
-            c_max{i}(q,1:1:2)=maxima{i}(q,2:-1:1); 
-            warning('chose new maximum')
-            o=o+1;
-        end
-    end
-    corr_area=nested_data((c_max{i}(q,2)-c_range):(c_max{i}(q,2)+c_range),(c_max{i}(q,1)-c_range):(c_max{i}(q,1)+c_range),i);
-    %C=xcorr2(nested_data(:,:,i+1),corr_area);
-    C=LeastSquareCorr(nested_data(:,:,i+1),corr_area);
-    [ssr,snd]=min(C(:));
-    [y_,x_]=ind2sub(size(C),snd);
-    c_max{i+1}(q,1)=x_-c_range;
-    c_max{i+1}(q,2)=y_-c_range;
+    
+    % contourplot of the precipitation
     contourf(log(nested_data(:,:,i)),log(Contours))
     colorbar('YTick',log(Contours),'YTickLabel',Contours);
     colormap(jet);
     caxis(log([Contours(1) Contours(length(Contours))]));
     colorbar('FontSize',12,'YTick',log(Contours),'YTickLabel',Contours);
     hold on
-    plot(c_max{i}(q,1),c_max{i}(q,2),'go','MarkerSize',20,'MarkerFaceColor','g')
-    plot(c_max{i+1}(q,1),c_max{i+1}(q,2),'bo','MarkerSize',20,'MarkerFaceColor','b')
     
-    l_len(i,q)=sqrt((c_max{i}(q,1)-c_max{i+1}(q,1))^2+(c_max{i}(q,2)-c_max{i+1}(q,2))^2);
-    l_alpha(i,q)=atan2((c_max{i+1}(q,2)-c_max{i}(q,2)),(c_max{i+1}(q,1)-c_max{i}(q,1)))*180/pi;
     
-    line([c_max{i+1}(q,1) c_max{i}(q,1) ],[c_max{i+1}(q,2) c_max{i}(q,2)],'LineWidth',5,'Color','k')
-    line([ 50 + 40 * cosd(l_alpha(i,q)) 50] , [ 50 + 40 * sind(l_alpha(i,q)) 50],'LineWidth',5,'Color','k')
-    %plot(maxima{i}(2),maxima{i}(1),'ko','MarkerSize',20,'MarkerFaceColor','k')
+    
+    for q=1:4
+        try
+            tic
+            if i ~=1
+                if c_max{i}(q,1) == c_max{i-1}(q,1) & c_max{i}(q,2) == c_max{i-1}(q,2) ...
+                        | nested_data(c_max{i}(q,1),c_max{i}(q,2),i) - mean([nested_data(c_max{i}(q,1),c_max{i}(q,2),i),nested_data(c_max{i}(q,1)+1,c_max{i}(q,2),i),nested_data(c_max{i}(q,1)+1,c_max{i}(q,2)+1,i),nested_data(c_max{i}(q,1)-1,c_max{i}(q,2),i),nested_data(c_max{i}(q,1)-1,c_max{i}(q,2)-1,i)]) > 0.1 ...%& nested_data(c_max{i}(1),c_max{i}(2),i) - mean([nested_data(c_max{i}(1),c_max{i}(2),i),nested_data(c_max{i}(1)+1,c_max{i}(2),i),nested_data(c_max{i}(1)+1,c_max{i}(2)+1,i),nested_data(c_max{i}(1)-1,c_max{i}(2),i),nested_data(c_max{i}(1)-1,c_max{i}(2)-1,i)]) < 0.01
+                        | nested_data(c_max{i}(q,1),c_max{i}(q,2),i) == 0 ...
+                        | nested_data(maxima{i}(q,2),maxima{i}(q,1),i)<0.1
+                        
+                    c_max{i}(q,1:1:2)=maxima{i}(q,2:-1:1);
+                    warning('chose new maximum')
+                    o=o+1;
+                end
+            end
+            corr_area=nested_data((c_max{i}(q,2)-c_range):(c_max{i}(q,2)+c_range),(c_max{i}(q,1)-c_range):(c_max{i}(q,1)+c_range),i);
+            %C=xcorr2(nested_data(:,:,i+1),corr_area);
+            C=LeastSquareCorr(nested_data(:,:,i+1),corr_area);
+            [ssr,snd]=min(C(:));
+            [y_,x_]=ind2sub(size(C),snd);
+            c_max{i+1}(q,1)=x_-c_range;
+            c_max{i+1}(q,2)=y_-c_range;
+            
+            plot(c_max{i}(q,1),c_max{i}(q,2),'go','MarkerSize',20,'MarkerFaceColor','g')
+            plot(c_max{i+1}(q,1),c_max{i+1}(q,2),'bo','MarkerSize',20,'MarkerFaceColor','b')
+            
+            l_len(i,q)=sqrt((c_max{i}(q,1)-c_max{i+1}(q,1))^2+(c_max{i}(q,2)-c_max{i+1}(q,2))^2);
+            l_alpha(i,q)=atan2((c_max{i+1}(q,2)-c_max{i}(q,2)),(c_max{i+1}(q,1)-c_max{i}(q,1)))*180/pi;
+            
+            line([c_max{i+1}(q,1) c_max{i}(q,1) ],[c_max{i+1}(q,2) c_max{i}(q,2)],'LineWidth',5,'Color','k')
+            line([ c_range + c_range * cosd(l_alpha(i,q)) c_range] , [ c_range + c_range * sind(l_alpha(i,q)) c_range],'LineWidth',5,'Color','k')
+            %plot(maxima{i}(2),maxima{i}(1),'ko','MarkerSize',20,'MarkerFaceColor','k')
+        catch
+            warning(strcat('Could not find a valid maximum in quadrant',q))
+        end
     end
+    
     if gif == 1
         drawnow
         frame = getframe(1);
@@ -161,4 +179,5 @@ for i=1:timesteps-1
     end
     hold off
     toc
+    pause(0.3)
 end
