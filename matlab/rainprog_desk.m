@@ -1,19 +1,28 @@
 close all;clear;
 
+
 filepath='D:/Programmieren/Rain/m4t_BKM_wrx00_l2_dbz_v00_20130511160000.nc';
+if strcmp(computer,'PCWIN64')
+    filepath='E:/Rainprog/m4t_BKM_wrx00_l2_dbz_v00_20130511210000.nc';
+end
+
 data=ncread(filepath,'dbz_ac1');
 azi=ncread(filepath,'azi');
 range=ncread(filepath,'range');
 
-
+%Variables
+%Gridvars:
 res=100; % horizontal resolution for the cartesian grid
 timesteps=120; % Number of timesteps
 small_val=0.1; % small value for the mean - TO BE DISCUSSED
 rain_threshold=0.1; % rain threshold
 gif=0; % boolean for gif 
+
 x=zeros(333,360);
 y=zeros(333,360);
+
 dataRain=zeros(333,360,120);
+
 R=333;
 phi=360;
 
@@ -115,8 +124,8 @@ o=0;
 Contours=[0.1 0.2 0.5 1 2 5 10 100];
 figure(1)
 filename='lqcorr2_4q.gif';
-l_len=zeros(120,1);
-l_alpha=zeros(120,1);
+l_len=nan(120,1);
+l_alpha=nan(120,1);
 
 
 

@@ -5,7 +5,7 @@ c_l=length(c);
 d_l=length(d);
 
 c_d=zeros(d_l+c_l-1,d_l+c_l-1);
-corr=ones(d_l+2*c_l-2,d_l+2*c_l-2)*999999;
+corr=ones(d_l+2*c_l-2,d_l+2*c_l-2)*inf;
 corr(c_l:d_l+c_l-1,c_l:d_l+c_l-1)=d;
 
 
