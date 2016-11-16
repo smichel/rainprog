@@ -1,22 +1,23 @@
 close all;clear;
-
-
-filepath='D:/Programmieren/Rain/m4t_BKM_wrx00_l2_dbz_v00_20130511160000.nc';
-if strcmp(computer,'PCWIN64')
+try 
+    filepath='D:/Programmieren/Rain/m4t_BKM_wrx00_l2_dbz_v00_20130511160000.nc';
+    data=ncread(filepath,'dbz_ac1');
+    azi=ncread(filepath,'azi');
+    range=ncread(filepath,'range');
+catch
     filepath='E:/Rainprog/m4t_BKM_wrx00_l2_dbz_v00_20130511210000.nc';
+    data=ncread(filepath,'dbz_ac1');
+    azi=ncread(filepath,'azi');
+    range=ncread(filepath,'range');
 end
-
-data=ncread(filepath,'dbz_ac1');
-azi=ncread(filepath,'azi');
-range=ncread(filepath,'range');
-
 %Variables
 %Gridvars:
 res=100; % horizontal resolution for the cartesian grid
-timesteps=120; % Number of timesteps
-small_val=0.1; % small value for the mean - TO BE DISCUSSED
+timesteps=40; % Number of timesteps
+small_val=2; % small value for the mean - TO BE DISCUSSED
 rain_threshold=0.1; % rain threshold
 gif=0; % boolean for gif 
+time=1;
 
 x=zeros(333,360);
 y=zeros(333,360);
@@ -124,10 +125,11 @@ o=0;
 Contours=[0.1 0.2 0.5 1 2 5 10 100];
 figure(1)
 filename='lqcorr2_4q.gif';
-l_len=nan(120,1);
-l_alpha=nan(120,1);
-
-
+l_len=nan(120,4);
+l_alpha=nan(120,4);
+alpha_flag=nan(120,4);
+dist=nan(4,1);
+dir=nan(120,1);
 
 for i=1:timesteps-1
     contourf(log(nested_data(:,:,i)),log(Contours))
@@ -145,32 +147,37 @@ for i=1:timesteps-1
                     if nested_data(c_max{i}(q,2),c_max{i}(q,1),i) == 0  ...% when c_max rans out of the circle of data
                             | ((c_max{i}(q,1) == c_max{i-1}(q,1)) & (c_max{i}(q,2) == c_max{i-1}(q,2))) ... % when the position of c_max doesnt change after one timestep
                             | nested_data(c_max{i}(q,2),c_max{i}(q,1),i) < rain_threshold ...% when the value is too small
-                            | nested_data(c_max{i}(q,2),c_max{i}(q,1),i) - mean([nested_data(c_max{i}(q,2),c_max{i}(q,1),i),nested_data(c_max{i}(q,2)+1, ...
+                            | nested_data(c_max{i}(q,2),c_max{i}(q,1),i) / mean([nested_data(c_max{i}(q,2),c_max{i}(q,1),i),nested_data(c_max{i}(q,2)+1, ...
                             c_max{i}(q,1),i),nested_data(c_max{i}(q,2)+1,c_max{i}(q,1)+1,i),nested_data(c_max{i}(q,2)-1,c_max{i}(q,1),i), ...
                             nested_data(c_max{i}(q,2)-1,c_max{i}(q,1)-1,i)]) > small_val ... % when the mean around c_max is low - there is a high chance its scatter or some bullshit
                             & nested_data(maxima{i}(q,1),maxima{i}(q,2),i) < rain_threshold % if maximum is too small in quadrant q
                         
                         c_max{i}(q,1:1:2)=NaN;
+                        alpha_flag(i,q)=NaN;
                         
                     elseif nested_data(c_max{i}(q,2),c_max{i}(q,1),i) == 0  ...% when c_max rans out of the circle of data
                             | ((c_max{i}(q,1) == c_max{i-1}(q,1)) & (c_max{i}(q,2) == c_max{i-1}(q,2))) ... % when the position of c_max doesnt change after one timestep
                             | nested_data(c_max{i}(q,2),c_max{i}(q,1),i) < rain_threshold ...% when the value is too small
-                            | nested_data(c_max{i}(q,2),c_max{i}(q,1),i) - mean([nested_data(c_max{i}(q,2),c_max{i}(q,1),i),nested_data(c_max{i}(q,2)+1, ...
+                            | nested_data(c_max{i}(q,2),c_max{i}(q,1),i) / mean([nested_data(c_max{i}(q,2),c_max{i}(q,1),i),nested_data(c_max{i}(q,2)+1, ...
                             c_max{i}(q,1),i),nested_data(c_max{i}(q,2)+1,c_max{i}(q,1)+1,i),nested_data(c_max{i}(q,2)-1,c_max{i}(q,1),i), ...
                             nested_data(c_max{i}(q,2)-1,c_max{i}(q,1)-1,i)]) > small_val ... % when the mean around c_max is low - there is a high chance its scatter or some bullshit
                             & nested_data(maxima{i}(q,1),maxima{i}(q,2),i) > rain_threshold % if maximum is too small in quadrant q
                         
                         c_max{i}(q,1:1:2)=maxima{i}(q,2:-1:1);
+                        alpha_flag(i,q)=3; % chose new maximum
                         display(sprintf('Chose a new maximum in quadrant %d at timestep %d',q,i));
                     end
                     
                 catch
                     if isnan(c_max{i}(q,1)) & isnan(c_max{i}(q,2)) & nested_data(maxima{i}(q,1),maxima{i}(q,2),i) > rain_threshold
                         c_max{i}(q,1:1:2)=maxima{i}(q,2:-1:1);
-                        display(sprintf('Chose a new maximum in quadrant %d at timestep %d',q,i));
+                        display(sprintf('Chose a new maximum in quadrant %d dat timestep %d',q,i));
+                        alpha_flag(i,q)=3; % chose new maximum
+                        
                     elseif ~isnan(c_max{i}(q,1)) & ~isnan(c_max{i}(q,2)) & nested_data(maxima{i}(q,1),maxima{i}(q,2),i) < rain_threshold
                         c_max{i+1}(q,1:1:2)=NaN;
                         display(sprintf('Couldnt find a new valid maximum in quadrant %d at timestep %d',q,i));
+                        alpha_flag(i,q)=NaN;
                     end
                 end
                 
@@ -201,9 +208,50 @@ for i=1:timesteps-1
         catch
             display(sprintf('Couldnt calculate the correlation for the quadrant %d dat timestep %d',q,i));
             c_max{i+1}(q,1:1:2)=NaN;
-
         end
     end
+    % anglechecking
+    l_alpha360=l_alpha(i,:);
+    % 360° conversion for critical values
+    if (sum(l_alpha360 < -90) > 0) & (sum(l_alpha360 > 90) > 0)
+        beh=l_alpha360 < -90;
+        idx=find(beh==1);
+        l_alpha360(idx)=360+l_alpha360(idx);        
+    end
+    
+
+    
+    for q=1:4
+
+        
+        if l_alpha360(q) < 0 & (sum(l_alpha360,'omitnan')-l_alpha360(q)) < 0
+            alpha = abs(l_alpha360(q)) - abs((sum(l_alpha360,'omitnan')-l_alpha360(q))/(3-sum(isnan(l_alpha360))));
+        else
+            alpha = l_alpha360(q) - (sum((l_alpha360),'omitnan')-l_alpha360(q))/(3-sum(isnan(l_alpha360)));
+        end
+        if abs(alpha) > 67.5 & alpha_flag(i,q) ~=3;
+            alpha_flag(i,q)=1;
+        elseif abs(alpha) <= 67.5 & alpha_flag(i,q) ~=3;
+            alpha_flag(i,q)=0;
+        end
+        
+        
+        dist(q)=sqrt((c_max{i}(q,1)-ceil(d_n/2))^2+(c_max{i}(q,2)-ceil(d_n/2))^2)*res;
+        if dist(q) > 19000
+            alpha_flag(i,q)=2; % EDGE
+        end
+    end
+    
+    for q=1:4
+        if l_alpha360(q) > 180
+            l_alpha360(q)= l_alpha360(q)-360;
+        end
+    end
+    
+    if sum(alpha_flag(i,:)==0)>1
+        dir(i)=sum(l_alpha360.*(alpha_flag(i,:)==0),'omitnan')/sum(alpha_flag(i,:)==0,'omitnan');
+    end
+    
     if gif == 1
         drawnow
         frame = getframe(1);
@@ -216,6 +264,6 @@ for i=1:timesteps-1
         end
     end
     hold off
-    pause(0.5)
+    pause(time)
     toc
 end
