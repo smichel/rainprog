@@ -1,11 +1,18 @@
 close all;clear;
-try 
+if ~strcmp(computer, 'MACI64')
+    try 
     filepath='D:/Programmieren/Rain/m4t_BKM_wrx00_l2_dbz_v00_20130511160000.nc';
     data=ncread(filepath,'dbz_ac1');
     azi=ncread(filepath,'azi');
     range=ncread(filepath,'range');
-catch
+    catch
     filepath='E:/Rainprog/m4t_BKM_wrx00_l2_dbz_v00_20130511210000.nc';
+    data=ncread(filepath,'dbz_ac1');
+    azi=ncread(filepath,'azi');
+    range=ncread(filepath,'range');
+    end
+else
+    filepath='/Users/u300675/m4t_BKM_wrx00_l2_dbz_v00_20130511160000.nc';
     data=ncread(filepath,'dbz_ac1');
     azi=ncread(filepath,'azi');
     range=ncread(filepath,'range');
@@ -212,7 +219,7 @@ for i=1:timesteps-1
     end
     % anglechecking
     l_alpha360=l_alpha(i,:);
-    % 360° conversion for critical values
+    % 360? conversion for critical values
     if (sum(l_alpha360 < -90) > 0) & (sum(l_alpha360 > 90) > 0)
         beh=l_alpha360 < -90;
         idx=find(beh==1);
