@@ -1,7 +1,7 @@
 close all;clear;
 if ~strcmp(computer, 'MACI64')
     try
-        filepath='D:/Programmieren/Rain/m4t_BKM_wrx00_l2_dbz_v00_20130511160000.nc';
+        filepath='D:/Programmieren/Rain/m4t_BKM_wrx00_l2_dbz_v00_20130424180000.nc';
         data=ncread(filepath,'dbz_ac1');
         azi=ncread(filepath,'azi');
         range=ncread(filepath,'range');
@@ -20,13 +20,13 @@ end
 %Variables
 %Gridvars:
 res=100; % horizontal resolution for the cartesian grid
-timesteps=120; % Number of timesteps
+timesteps=80; % Number of timesteps
 small_val=2; % small value for the mean - TO BE DISCUSSED
 rain_threshold=0.1; % rain threshold
-gif=1; % boolean for gif
+gif=0; % boolean for gif
 time=1;
-prog=30; % starttime of the prognosis
-uk=10; % Number of interpolation points
+prog=53; % starttime of the prognosis
+uk=5; % Number of interpolation points
 progtime=60; % how many timesteps for the prognosis
 filename='1st_prog.gif';
 
@@ -206,12 +206,17 @@ for i=1:timesteps-1
             c_max{i+1}(q,1)=c_max{i}(q,1)-3*c_range+x_-1;
             c_max{i+1}(q,2)=c_max{i}(q,2)-3*c_range+y_-1;
             
+            if alpha_flag(i,q)~=3
+                alpha_flag(i,q)=0;
+            end
             if ((c_max{i}(q,1) == c_max{i+1}(q,1)) & (c_max{i}(q,2) == c_max{i+1}(q,2))) % when the position of c_max doesnt change after one timestep
                 c_max{i+1}(q,1:1:2)=NaN;
                 alpha_flag(i+1,q)=NaN;
             end
             plot(c_max{i}(q,1),c_max{i}(q,2),'go','MarkerSize',20,'MarkerFaceColor','g')
             plot(c_max{i+1}(q,1),c_max{i+1}(q,2),'bo','MarkerSize',20,'MarkerFaceColor','b')
+            
+
             
             l_len(i,q)=sqrt((c_max{i}(q,1)-c_max{i+1}(q,1))^2+(c_max{i}(q,2)-c_max{i+1}(q,2))^2);
             l_alpha(i,q)=atan2((c_max{i+1}(q,2)-c_max{i}(q,2)),(c_max{i+1}(q,1)-c_max{i}(q,1)))*180/pi;
@@ -234,7 +239,6 @@ for i=1:timesteps-1
     end
     
     
-    
     for q=1:4
         
         
@@ -243,9 +247,9 @@ for i=1:timesteps-1
         else
             alpha = l_alpha360(i,q) - (sum((l_alpha360(i,:)),'omitnan')-l_alpha360(i,q))/(3-sum(isnan(l_alpha360(i,:))));
         end
-        if abs(alpha) > 67.5 & alpha_flag(i,q) ~=3;
+        if abs(alpha) > 67.5 & alpha_flag(i,q) ~=3
             alpha_flag(i,q)=1;
-        elseif abs(alpha) <= 67.5 & alpha_flag(i,q) ~=3;
+        elseif abs(alpha) <= 67.5 & alpha_flag(i,q) ~=3
             alpha_flag(i,q)=0;
         end
         
@@ -255,6 +259,10 @@ for i=1:timesteps-1
             alpha_flag(i,q)=2; % EDGE
         end
     end
+    
+%     if sum(~isnan(alpha_flag(i,:)),'omitnan')==1 & sum(alpha_flag(i,:),'omitnan')~=3
+%         alpha_flag(i,find(~isnan(alpha_flag(i,:))))=0;
+%     end
     
     if sum(l_alpha360(i,:) < 270 & l_alpha360(i,:) > 90) ~= 0
         dir(i)=sum(l_alpha360(i,:).*(alpha_flag(i,:)==0),'omitnan')/sum(alpha_flag(i,:)==0,'omitnan');
@@ -266,12 +274,15 @@ for i=1:timesteps-1
             end
         end
         
-        if sum(alpha_flag(i,:)==0)>1
+        if sum(alpha_flag(i,:)==0)>=1
             dir(i)=sum(l_alpha360(i,:).*(alpha_flag(i,:)==0),'omitnan')/sum(alpha_flag(i,:)==0,'omitnan');
-            v(i)=sum(l_len(i,:).*(alpha_flag(i,:)==0),'omitnan')/sum(alpha_flag(i,:)==0,'omitnan');
+        end
+        if dir(i)<0
+            dir(i)=dir(i)+360;
         end
     end
-    
+    v(i)=sum(l_len(i,:).*(alpha_flag(i,:)==0),'omitnan')/sum(alpha_flag(i,:)==0,'omitnan');
+
 
     if gif == 1
         drawnow
@@ -288,11 +299,8 @@ for i=1:timesteps-1
     pause(time)
     toc
     
-    if i+1==prog
-        break
-    end
 end
-
+%%
 v_bar=nan(prog,1);
 dir_bar=nan(prog,1);
 delta_dir=nan(prog,1);
@@ -300,7 +308,16 @@ delta_v=nan(prog,1);
 
 for k=1+uk:prog
     v_bar(k)=mean(v(k-uk:k),'omitnan')*res;
-    dir_bar(k)=mean(dir(k-uk:k),'omitnan');
+    if sum(dir(k-uk:k) < 270 & dir(k-uk:k) > 90) ~= 0
+        dir_bar(k)=mean(dir(k-uk:k),'omitnan');
+    else
+        for l=-uk:1:0
+            if dir(k+l)>180
+                dir(k+l)=dir(k+l)-360;
+            end
+        end
+        dir_bar(k)=mean(dir(k-uk:k),'omitnan');
+    end
 end
 
 v_bar_s=v_bar/30;
@@ -321,7 +338,8 @@ delta_y=v_bar(prog)*sind(dir_bar(prog));
 X_prog=NaN(d_s,d_s,progtime);
 Y_prog=NaN(d_s,d_s,progtime);
 prog_data=NaN(d_s,d_s,progtime);
-for k=1:progtime
+if ~isnan(delta_x) || ~isnan(delta_y)
+    for k=1:progtime
     tic
     prog_data(:,:,k)= griddata((x_car+delta_x*k)+delta_v(prog)*30*k*cosd(dir_bar(prog)+delta_dir(prog)*k),...
     (y_car+delta_y*k)+delta_v(prog)*30*k*sind(dir_bar(prog)+delta_dir(prog)*k),...
@@ -329,13 +347,16 @@ for k=1:progtime
     toc
     contourf(log(prog_data(:,:,k)),log(Contours))
     hold on
-    contour(log(cut_data(:,:,i+2+k)))
-
+    contour(log(cut_data(:,:,prog+1+k)),log(Contours))
+    
     colorbar('YTick',log(Contours),'YTickLabel',Contours);
     colormap(jet);
     caxis(log([Contours(1) Contours(length(Contours))]));
     colorbar('FontSize',12,'YTick',log(Contours),'YTickLabel',Contours);
     hold on
+    if k== timesteps-prog-1
+        break
+    end
     pause(0.5)
     if gif == 1
         drawnow
@@ -349,4 +370,5 @@ for k=1:progtime
         end
     end
     hold off
+    end
 end
