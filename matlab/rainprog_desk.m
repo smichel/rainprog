@@ -6,7 +6,7 @@ if ~strcmp(computer, 'MACI64')
         azi=ncread(filepath,'azi');
         range=ncread(filepath,'range');
     catch
-        filepath='E:/Rainprog/m4t_BKM_wrx00_l2_dbz_v00_20130511160000.nc';
+        filepath='E:/Rainprog/m4t_BKM_wrx00_l2_dbz_v00_20130511170000.nc';
         data=ncread(filepath,'dbz_ac1');
         azi=ncread(filepath,'azi');
         range=ncread(filepath,'range');
@@ -20,14 +20,14 @@ end
 %Variables
 %Gridvars:
 res=100; % horizontal resolution for the cartesian grid
-timesteps=80; % Number of timesteps
+timesteps=50; % Number of timesteps
 small_val=2; % small value for the mean - TO BE DISCUSSED
 rain_threshold=0.1; % rain threshold
 gif=0; % boolean for gif
 time=1;
-prog=53; % starttime of the prognosis
+prog=25; % starttime of the prognosis
 uk=5; % Number of interpolation points
-progtime=60; % how many timesteps for the prognosis
+progtime=20; % how many timesteps for the prognosis
 filename='1st_prog.gif';
 
 x=zeros(333,360);
@@ -277,12 +277,13 @@ for i=1:timesteps-1
         if sum(alpha_flag(i,:)==0)>=1
             dir(i)=sum(l_alpha360(i,:).*(alpha_flag(i,:)==0),'omitnan')/sum(alpha_flag(i,:)==0,'omitnan');
         end
-        if dir(i)<0
-            dir(i)=dir(i)+360;
-        end
+
     end
     v(i)=sum(l_len(i,:).*(alpha_flag(i,:)==0),'omitnan')/sum(alpha_flag(i,:)==0,'omitnan');
-
+    
+    if dir(i)<0
+        dir(i)=dir(i)+360;
+    end
 
     if gif == 1
         drawnow
@@ -305,21 +306,22 @@ v_bar=nan(prog,1);
 dir_bar=nan(prog,1);
 delta_dir=nan(prog,1);
 delta_v=nan(prog,1);
-
+dir_=dir;
 for k=1+uk:prog
     v_bar(k)=mean(v(k-uk:k),'omitnan')*res;
-    if sum(dir(k-uk:k) < 270 & dir(k-uk:k) > 90) ~= 0
-        dir_bar(k)=mean(dir(k-uk:k),'omitnan');
-    else
+    dir_bar(k)=mean(dir(k-uk:k),'omitnan');
+    if (sum(dir(k-uk:k)>0 & dir(k-uk:k) < 90)~= 0) & (sum(dir(k-uk:k)>270 & dir(k-uk:k)<360) ~=0)
         for l=-uk:1:0
             if dir(k+l)>180
-                dir(k+l)=dir(k+l)-360;
+                dir_(k+l)=dir(k+l)-360;
             end
         end
-        dir_bar(k)=mean(dir(k-uk:k),'omitnan');
+        dir_bar(k)=mean(dir_(k-uk:k),'omitnan');
+    end
+    if dir_bar(k)<0
+        dir_bar(k) = dir_bar(k)+360;
     end
 end
-
 v_bar_s=v_bar/30;
 
 for k=1+uk:prog
@@ -372,3 +374,24 @@ if ~isnan(delta_x) || ~isnan(delta_y)
     hold off
     end
 end
+%% data evaluation
+
+rel_data=cut_data(:,:,prog:end);
+pro_data=prog_data(:,:,1:end-1);
+figure
+off=0;
+off_t=zeros(size(prog_data,3),1);
+for i=1:20000
+    X=randi([200 400],1);
+    Y=randi([1 400],1);
+    %plot(squeeze((rel_data(X,Y,:)-prog_data(X,Y,:))))
+    %leg{i}=strcat(num2str(X),',',num2str(Y));
+    off=off+sum(rel_data(X,Y,:),'omitnan')-sum(prog_data(X,Y,:),'omitnan');
+    for k=1:size(prog_data,3)
+        off_t(k)=off_t(k)+sum(rel_data(X,Y,k),'omitnan')-sum(prog_data(X,Y,k),'omitnan');
+    end
+    hold on
+end
+off=off/i;
+off_t=off_t/i;
+plot(off_t)
