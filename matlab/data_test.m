@@ -35,6 +35,7 @@ end
 off=off/i;
 off_t=off_t/i;
 plot(off_t)
+corr2
 %legend(leg)
 figure
 for i=1:60

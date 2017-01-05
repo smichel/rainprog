@@ -19,7 +19,7 @@ else
 end
 %Variables
 %Gridvars:
-res=100; % horizontal resolution for the cartesian grid
+res=200; % horizontal resolution for the cartesian grid
 timesteps=50; % Number of timesteps
 small_val=2; % small value for the mean - TO BE DISCUSSED
 rain_threshold=0.1; % rain threshold
@@ -68,7 +68,7 @@ max_y=zeros(1,3);
 
 %transformation from polar to cartesian
 %scatteredinterpolant wurde als scheiﬂe considered
-for i=1:timesteps
+parfor i=1:timesteps
     tic
     data(:,:,i)=0.0364633*(10.^(data(:,:,i)/10)).^0.625;
     data_car{i}= griddata(x,y,data(:,:,i),X,Y);
@@ -346,6 +346,9 @@ if ~isnan(delta_x) || ~isnan(delta_y)
     prog_data(:,:,k)= griddata((x_car+delta_x*k)+delta_v(prog)*30*k*cosd(dir_bar(prog)+delta_dir(prog)*k),...
     (y_car+delta_y*k)+delta_v(prog)*30*k*sind(dir_bar(prog)+delta_dir(prog)*k),...
     cut_data(:,:,prog+1),X,Y);
+
+    cut_data(:,:,prog+1+k)=cut_data(:,:,prog+1+k)+NaNmask(prog_data(:,:,k),cut_data(:,:,prog+1+k));
+
     toc
     contourf(log(prog_data(:,:,k)),log(Contours))
     hold on
@@ -376,22 +379,31 @@ if ~isnan(delta_x) || ~isnan(delta_y)
 end
 %% data evaluation
 
-rel_data=cut_data(:,:,prog:end);
-pro_data=prog_data(:,:,1:end-1);
-figure
-off=0;
-off_t=zeros(size(prog_data,3),1);
-for i=1:20000
-    X=randi([200 400],1);
-    Y=randi([1 400],1);
-    %plot(squeeze((rel_data(X,Y,:)-prog_data(X,Y,:))))
-    %leg{i}=strcat(num2str(X),',',num2str(Y));
-    off=off+sum(rel_data(X,Y,:),'omitnan')-sum(prog_data(X,Y,:),'omitnan');
-    for k=1:size(prog_data,3)
-        off_t(k)=off_t(k)+sum(rel_data(X,Y,k),'omitnan')-sum(prog_data(X,Y,k),'omitnan');
-    end
-    hold on
+real_data=cut_data(:,:,prog:end);
+prognosis_data=prog_data(:,:,1:end-1);
+for i=1:size(prognosis_data,3)
+    real_data(:,:,i)=real_data(:,:,i)+NaNmask(real_data(:,:,i),prognosis_data(:,:,i));
 end
-off=off/i;
-off_t=off_t/i;
-plot(off_t)
+% figure
+% off=0;
+% off_t=zeros(size(prog_data,3),1);
+% for i=1:5000
+%     X=randi([200 400],1);
+%     Y=randi([200 400],1);
+%     %plot(squeeze((rel_data(X,Y,:)-prog_data(X,Y,:))))
+%     %leg{i}=strcat(num2str(X),',',num2str(Y));
+%     off=off+sum(rel_data(X,Y,:),'omitnan')-sum(prog_data(X,Y,:),'omitnan');
+%     for k=1:size(prog_data,3)
+%         off_t(k)=off_t(k)+sum(rel_data(X,Y,k),'omitnan')-sum(prog_data(X,Y,k),'omitnan');
+%     end
+%     hold on
+% end
+% off=off/i;
+% off_t=off_t/i;
+% plot(off_t)
+ for i=1:size(prognosis_data,3)
+co(i)=NaNcorr(real_data(:,:,i),prognosis_data(:,:,i));
+ end
+
+figure
+plot(co)
