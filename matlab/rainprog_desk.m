@@ -1,33 +1,38 @@
-close all;clear;
+close all;
+clear;
 if ~strcmp(computer, 'MACI64')
     try
-        filepath='D:/Programmieren/Rain/m4t_BKM_wrx00_l2_dbz_v00_20130424180000.nc';
+        filepath='D:/Programmieren/Rain/m4t_BKM_wrx00_l2_dbz_v00_20130511160000.nc'; %Joscha home PC
         data=ncread(filepath,'dbz_ac1');
         azi=ncread(filepath,'azi');
         range=ncread(filepath,'range');
     catch
-        filepath='E:/Rainprog/m4t_BKM_wrx00_l2_dbz_v00_20130511170000.nc';
+        filepath='E:/Rainprog/m4t_BKM_wrx00_l2_dbz_v00_20130511170000.nc';     %Simon home PC
         data=ncread(filepath,'dbz_ac1');
         azi=ncread(filepath,'azi');
         range=ncread(filepath,'range');
     end
 else
-    filepath='/Users/u300675/m4t_BKM_wrx00_l2_dbz_v00_20130511160000.nc';
+    filepath='/Users/u300675/m4t_BKM_wrx00_l2_dbz_v00_20130511160000.nc';       %Simon work mac
     data=ncread(filepath,'dbz_ac1');
     azi=ncread(filepath,'azi');
     range=ncread(filepath,'range');
 end
 %Variables
 %Gridvars:
-res=200; % horizontal resolution for the cartesian grid
-timesteps=50; % Number of timesteps
+res=100; % horizontal resolution for the cartesian grid
+timesteps=30; % Number of timesteps
 small_val=2; % small value for the mean - TO BE DISCUSSED
 rain_threshold=0.1; % rain threshold
 gif=0; % boolean for gif
 time=1;
-prog=25; % starttime of the prognosis
+prog=10; % starttime of the prognosis
 uk=5; % Number of interpolation points
-progtime=20; % how many timesteps for the prognosis
+progtime=15; % how many timesteps for the prognosis
+U=5.7; % speed of the blob
+V=5.3; % speed of the blob
+x0=60; % startposition of the blob
+y0=60; % startposition of the blob
 filename='1st_prog.gif';
 
 x=zeros(333,360);
@@ -76,6 +81,9 @@ parfor i=1:timesteps
     toc
 end
 %setting nans to 0
+
+% data_car=blobmaker(U,V,60,60,res,10,5,timesteps);
+
 for i=1:timesteps
     for j=1:length(data_car{i})
         for o=1:length(data_car{i})
@@ -134,7 +142,7 @@ for q=1:4
 end
 o=0;
 Contours=[0.1 0.2 0.5 1 2 5 10 100];
-figure(1)
+figure
 l_len=nan(120,4);
 l_alpha=nan(120,4);
 l_alpha360=nan(120,4);
@@ -345,7 +353,7 @@ if ~isnan(delta_x) || ~isnan(delta_y)
     tic
     prog_data(:,:,k)= griddata((x_car+delta_x*k)+delta_v(prog)*30*k*cosd(dir_bar(prog)+delta_dir(prog)*k),...
     (y_car+delta_y*k)+delta_v(prog)*30*k*sind(dir_bar(prog)+delta_dir(prog)*k),...
-    cut_data(:,:,prog+1),X,Y);
+    cut_data(:,:,prog+1),X,Y,'natural');
 
     cut_data(:,:,prog+1+k)=cut_data(:,:,prog+1+k)+NaNmask(prog_data(:,:,k),cut_data(:,:,prog+1+k));
 
@@ -381,29 +389,26 @@ end
 
 real_data=cut_data(:,:,prog:end);
 prognosis_data=prog_data(:,:,1:end-1);
+
 for i=1:size(prognosis_data,3)
     real_data(:,:,i)=real_data(:,:,i)+NaNmask(real_data(:,:,i),prognosis_data(:,:,i));
 end
-% figure
-% off=0;
-% off_t=zeros(size(prog_data,3),1);
-% for i=1:5000
-%     X=randi([200 400],1);
-%     Y=randi([200 400],1);
-%     %plot(squeeze((rel_data(X,Y,:)-prog_data(X,Y,:))))
-%     %leg{i}=strcat(num2str(X),',',num2str(Y));
-%     off=off+sum(rel_data(X,Y,:),'omitnan')-sum(prog_data(X,Y,:),'omitnan');
-%     for k=1:size(prog_data,3)
-%         off_t(k)=off_t(k)+sum(rel_data(X,Y,k),'omitnan')-sum(prog_data(X,Y,k),'omitnan');
-%     end
-%     hold on
-% end
-% off=off/i;
-% off_t=off_t/i;
-% plot(off_t)
+
  for i=1:size(prognosis_data,3)
-co(i)=NaNcorr(real_data(:,:,i),prognosis_data(:,:,i));
+    co1(i)=NaNcorr(real_data(:,:,i),prognosis_data(:,:,i));
+    real_ones_data=real_data(:,:,i);
+    real_ones_data=real_ones_data(:);
+    real_ones_data(real_ones_data>0.1)=1;
+    real_ones_data(real_ones_data<=0.1)=0;
+    
+    prognosis_ones_data=prognosis_data(:,:,i);
+    prognosis_ones_data=prognosis_ones_data(:);
+    prognosis_ones_data(prognosis_ones_data>0.1)=1;
+    prognosis_ones_data(prognosis_ones_data<=0.1)=0;
+    co2(i)=NaNcorr(real_ones_data,prognosis_ones_data);
  end
 
 figure
-plot(co)
+plot(co1)
+hold on
+plot(co2)

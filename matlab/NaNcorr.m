@@ -9,4 +9,10 @@ y_bar=mean(y,'omitnan');
 
 corr=sum((x-x_bar).*(y-y_bar),'omitnan')/...
         sqrt((sum((x-x_bar).^2,'omitnan'))*(sum((y-y_bar).^2,'omitnan')));
+
+if x==y    
+    corr=1;
+elseif x==-y
+    corr=-1;
+end
 end
