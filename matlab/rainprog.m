@@ -1,4 +1,4 @@
-function [ co1,co2 ] = rainprog( timesteps,prog,progtime,uk,filepath )
+function [ co1,co2 ] = rainprog(res,timesteps,prog,progtime,uk,filepath )
 % if ~strcmp(computer, 'MACI64')
 %     try
 %         filepath='D:/Programmieren/Rain/m4t_BKM_wrx00_l2_dbz_v00_20130511160000.nc'; %Joscha home PC
@@ -23,8 +23,8 @@ range=ncread(filepath,'range');
 % prog=10; % starttime of the prognosis
 % progtime=15; % how many timesteps for the prognosis
 % uk=5; % Number of interpolation points
+%res=100; % horizontal resolution for the cartesian grid
 
-res=100; % horizontal resolution for the cartesian grid
 small_val=2; % small value for the mean - TO BE DISCUSSED
 rain_threshold=0.1; % rain threshold
 gif=0; % boolean for gif
@@ -156,7 +156,7 @@ for i=1:timesteps-1
 %    colormap(jet);
 %    caxis(log([Contours(1) Contours(length(Contours))]));
 %    colorbar('FontSize',12,'YTick',log(Contours),'YTickLabel',Contours);
-    hold on
+%    hold on
     for q=1:4
         try
             if i ~=1
