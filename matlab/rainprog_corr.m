@@ -1,26 +1,30 @@
 close all; clear;
-for i=1:1:10
-    for res=100:100:200
-    prog=(i+2)*5;
-    progtime=15;
-    uk=5;
-    timesteps=(i+2)*5+progtime+5;
-    tic
-    [co1{i,res/100},co2{i,res/100}]=rainprog(res,timesteps,prog,progtime,uk,'E:/Rainprog/m4t_BKM_wrx00_l2_dbz_v00_20130511160000.nc');
-    toc
+
+path=strcat('/home/zmaw/u300675/pattern_data/');
+files=dir(path);
+files=files(3:end);
+len=length(files);
+
+for j=1
+    for i=1
+        res=200;
+        prog=(i+2)*5;
+        progtime=20;
+        uk=5;
+        timesteps=prog+progtime+5;
+        [co1{j,i},co2{j,i}]=rainprog(res,timesteps,prog,progtime,uk,strcat(path,files(j).name));
     end
+    display(sprintf('Progress %d%%',floor(j/len*100)));
 end
 
-colors=hsv(length(co1));
+colors=winter(size(co1,1));
 
 figure
 plot(0.5,'k')
 hold on
-plot(0.5,'k-.')
-legend('Auflösung 100m','Auflösung 200m')
-for i=1:length(co1)
-plot(co1{i,1},'Color',colors(i,:),'LineWidth',2)
+for j=1:size(co1,1)
+    for i=1:size(co1,1)
+        plot(co2{j,i},'Color',colors(j,:),'LineWidth',2)
+    end
 end
-for i=1:length(co1)
-plot(co1{i,2},'Color',colors(i,:),'Linestyle','-.','LineWidth',2)
-end
+
