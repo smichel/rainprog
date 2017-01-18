@@ -5,11 +5,11 @@ files=dir(path);
 files=files(3:end);
 len=length(files);
 
-for j=1
-    for i=1
+parfor j=1:len
+    for i=1:13
         res=200;
         prog=(i+2)*5;
-        progtime=20;
+        progtime=30;
         uk=5;
         timesteps=prog+progtime+5;
         [co1{j,i},co2{j,i}]=rainprog(res,timesteps,prog,progtime,uk,strcat(path,files(j).name));
