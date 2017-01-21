@@ -1,4 +1,4 @@
-function[corr]=NaNCorr(x,y)
+function[corr]=NaNcorr(x,y)
 %Calculates the correlation between 2 matrices x and y whilst ignoring NaNs
 x=x(:);
 y=y(:);
