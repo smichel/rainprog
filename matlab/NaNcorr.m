@@ -1,5 +1,5 @@
-function[corr]=NaNCorr(x,y)
-%Calculates the correlation between 2 matrices x and y whilst ignoring NaNs
+function[corr]=NaNcorr(x,y)
+%Calculates the correlation between 2 matrices c and d with ignoring NaNs
 x=x(:);
 y=y(:);
 
@@ -9,10 +9,4 @@ y_bar=mean(y,'omitnan');
 
 corr=sum((x-x_bar).*(y-y_bar),'omitnan')/...
         sqrt((sum((x-x_bar).^2,'omitnan'))*(sum((y-y_bar).^2,'omitnan')));
-
-if x==y    
-    corr=1;
-elseif x==-y
-    corr=-1;
-end
 end
