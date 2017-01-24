@@ -1,6 +1,6 @@
 close all;
 clear;
-if ~strcmp(computer, 'MACI64')
+if ~strcmp(computer, 'GLNXA64')
     try
         filepath='D:/Programmieren/Rain/m4t_BKM_wrx00_l2_dbz_v00_20130511160000.nc'; %Joscha home PC
         data=ncread(filepath,'dbz_ac1');
@@ -13,7 +13,7 @@ if ~strcmp(computer, 'MACI64')
         range=ncread(filepath,'range');
     end
 else
-    filepath='/Users/u300675/m4t_BKM_wrx00_l2_dbz_v00_20130511160000.nc';       %Simon work mac
+    filepath='/home/zmaw/u300675/pattern_data/m4t_BKM_wrx00_l2_dbz_v00_20130511160000.nc';       %Simon work mac
     data=ncread(filepath,'dbz_ac1');
     azi=ncread(filepath,'azi');
     range=ncread(filepath,'range');
@@ -234,9 +234,8 @@ for i=1:timesteps-1
             
             line([c_max{i+1}(q,1) c_max{i}(q,1) ],[c_max{i+1}(q,2) c_max{i}(q,2)],'LineWidth',5,'Color','k')
             line([ 50 + 40 * cosd(l_alpha(i,q)) 50] , [ 50 + 40 * sind(l_alpha(i,q)) 50],'LineWidth',5,'Color','k')
-            %plot(maxima{i}(2),maxima{i}(1),'ko','MarkerSize',20,'MarkerFaceColor','k')
         catch
-            display(sprintf('Couldnt calculate the correlation for the quadrant %d dat timestep %d',q,i));
+            display(sprintf('Couldnt calculate the correlation for the quadrant %d at timestep %d',q,i));
             c_max{i+1}(q,1:1:2)=NaN;
         end
     end
@@ -264,11 +263,8 @@ for i=1:timesteps-1
             alpha_flag(i,q)=0;
         end
         
-        %if (ß-80) >=0 & (ß-80)-alpha <=0 -> ok
-        
-        
         dist(q)=sqrt((c_max{i}(q,1)-ceil(d_n/2))^2+(c_max{i}(q,2)-ceil(d_n/2))^2)*res;
-        if dist(q) > 19000
+        if dist(q) > 19000 & alpha_flag(i,q)==0
                 
                 if (l_beta(i,q)-better_beta_parameter)>=0
                     

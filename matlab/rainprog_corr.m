@@ -2,19 +2,19 @@ close all; clear;
 
 path=strcat('/home/zmaw/u300675/pattern_data/');
 files=dir(path);
-files=files(3:end);
+files=files(11:15);
 len=length(files);
 
 parfor j=1:len
-    for i=1:13
+    for i=1:5
         try
-        res=200;
+        res=100;
         prog=(i+2)*5;
         progtime=30;
         uk=5;
         timesteps=prog+progtime+5;
         [co1{j,i},co2{j,i}]=rainprog(res,timesteps,prog,progtime,uk,strcat(path,files(j).name));
-        res=100;
+        res=50;
         [co1_7{j,i},co2_7{j,i}]=rainprog(res,timesteps,prog,progtime,uk,strcat(path,files(j).name));
         catch
             co1{j,i}=NaN(1,progtime-1);
@@ -29,14 +29,14 @@ end
 colors=winter(size(co1,1));
 
 
-
+% 
 % figure
 % plot(0.5,'k')
 % hold on
 k=1;
 for j=1:size(co1,1)
     for i=1:size(co1,2)
-        %plot(co1{j,i},'Color',colors(j,:),'LineWidth',2)
+%         plot(co1{j,i},'Color',colors(j,:),'LineWidth',2)
         for k=1:size(co1{j,i},2)
             cor1(j,i,k)=co1{j,i}(k);
         end
@@ -48,7 +48,7 @@ for j=1:size(co1,1)
     end
 end
 
-%plot(squeeze(mean(mean(cor1(:,:,:),2,'omitnan'),'omitnan')),'Color',[0 0 0],'LineWidth',5)
+% plot(squeeze(mean(mean(cor1(:,:,:),2,'omitnan'),'omitnan')),'Color',[0 0 0],'LineWidth',5)
 
 % figure
 % plot(0.5,'k')
@@ -67,7 +67,8 @@ for j=1:size(co1,1)
         end
     end
 end
-% plot(squeeze(mean(mean(cor1_7(:,:,:),2,'omitnan'),'omitnan')),'Color',[0 0 0],'LineWidth',5)
-save('correlation_factors6.mat');
-% figure
-% plot(squeeze(mean(mean(cor1_7(:,:,:),2,'omitnan'),'omitnan'))-squeeze(mean(mean(cor1(:,:,:),2,'omitnan'),'omitnan')))
+plot(squeeze(mean(mean(cor1_7(:,:,:),2,'omitnan'),'omitnan')),'Color',[0 0 0],'LineWidth',5)
+
+figure
+plot(squeeze(mean(mean(cor1_7(:,:,:),2,'omitnan'),'omitnan'))-squeeze(mean(mean(cor1(:,:,:),2,'omitnan'),'omitnan')))
+%save('resolution_50m_100m.mat');

@@ -1,18 +1,4 @@
 function [ co1,co2 ] = rainprog(res,timesteps,prog,progtime,uk,filepath )
-% if ~strcmp(computer, 'MACI64')
-%     try
-%         filepath='D:/Programmieren/Rain/m4t_BKM_wrx00_l2_dbz_v00_20130511160000.nc'; %Joscha home PC
-%         data=ncread(filepath,'dbz_ac1');
-%         azi=ncread(filepath,'azi');
-%         range=ncread(filepath,'range');
-%     catch
-%         %filepath='E:/Rainprog/m4t_BKM_wrx00_l2_dbz_v00_20130511170000.nc';     %Simon home PC
-%         data=ncread(filepath,'dbz_ac1');
-%         azi=ncread(filepath,'azi');
-%         range=ncread(filepath,'range');
-%     end
-% else
-%     filepath='/Users/u300675/m4t_BKM_wrx00_l2_dbz_v00_20130511160000.nc';       %Simon work mac
 data=ncread(filepath,'dbz_ac1');
 azi=ncread(filepath,'azi');
 range=ncread(filepath,'range');
@@ -73,7 +59,7 @@ max_x=zeros(1,3);
 max_y=zeros(1,3);
 
 %transformation from polar to cartesian
-%scatteredinterpolant wurde als scheiße considered
+%scatteredinterpolant wurde als scheiï¿½e considered
 for i=1:timesteps
     data(:,:,i)=0.0364633*(10.^(data(:,:,i)/10)).^0.625;
     data_car{i}= griddata(x,y,data(:,:,i),X,Y);
@@ -236,7 +222,7 @@ for i=1:timesteps-1
     end
     % anglechecking
     l_alpha360(i,:)=l_alpha(i,:);
-    % 360° conversion for critical values
+    % 360ï¿½ conversion for critical values
     if (sum(l_alpha360(i,:) < -90) > 0) & (sum(l_alpha360(i,:) > 90) > 0)
         beh=l_alpha360(i,:) < -90;
         idx=find(beh==1);
@@ -260,15 +246,38 @@ for i=1:timesteps-1
         
         
         dist(q)=sqrt((c_max{i}(q,1)-ceil(d_n/2))^2+(c_max{i}(q,2)-ceil(d_n/2))^2)*res;
-        if dist(q) > 19000
-            alpha_flag(i,q)=2; % EDGE
+        if dist(q) > 19000 & alpha_flag(i,q)==0
+                
+                if (l_beta(i,q)-better_beta_parameter)>=0
+                    
+                    if (l_beta(i,q) - better_beta_parameter) -l_alpha360(i,q) >= 0
+                        alpha_flag(i,q)=2; % EDGE
+                    end
+                    
+                elseif (l_beta(i,q) -l_alpha360(i,q) + better_beta_parameter) >= 0
+                    alpha_flag(i,q)=2; % EDGE
+                end
+                
+                if (l_beta(i,q) + better_beta_parameter)<=360
+                    
+                    if (l_beta(i,q) + better_beta_parameter) -l_alpha360(i,q) < 0
+                        alpha_flag(i,q)=2; % EDGE
+                    end
+                    
+                elseif (l_beta(i,q) +l_alpha360(i,q) - better_beta_parameter) > 360
+                        alpha_flag(i,q)=2; % EDGE
+                end
+        
         end
+
     end
     
 %     if sum(~isnan(alpha_flag(i,:)),'omitnan')==1 & sum(alpha_flag(i,:),'omitnan')~=3
 %         alpha_flag(i,find(~isnan(alpha_flag(i,:))))=0;
 %     end
     
+
+
     if sum(l_alpha360(i,:) < 270 & l_alpha360(i,:) > 90) ~= 0
         dir(i)=sum(l_alpha360(i,:).*(alpha_flag(i,:)==0),'omitnan')/sum(alpha_flag(i,:)==0,'omitnan');
     else
