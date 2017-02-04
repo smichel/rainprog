@@ -1,5 +1,5 @@
 close all; clear;
-
+%E:/Rainprog/m4t_BKM_wrx00_l2_dbz_v00_20130511170000.nc
 path=strcat('/home/zmaw/u300675/pattern_data/');
 files=dir(path);
 files=files(3:end);
@@ -7,15 +7,15 @@ len=length(files);
 t_len=5;
 progtime=30;
 plots=0;
-
-parfor j=1:len
+rain_threshold=0.2; % rain threshold
+for j=1:len
     for i=1:10
-        try
+       try
         res=200;
         prog=(i+4)*5;
         uk=10;
         timesteps=prog+progtime+5;
-        [co1{j,i},co2{j,i}]=rainprog(res,timesteps,prog,progtime,uk,strcat(path,files(j).name));
+        [co1{j,i},co2{j,i}]=rainprog(rain_threshold,res,timesteps,prog,progtime,uk,strcat(path,files(j).name));
         catch
             co1{j,i}=NaN(1,progtime-1);
             co2{j,i}=NaN(1,progtime-1);
