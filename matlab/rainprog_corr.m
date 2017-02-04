@@ -8,7 +8,7 @@ t_len=5;
 progtime=30;
 plots=0;
 rain_threshold=0.2; % rain threshold
-for j=1:len
+parfor j=1:len
     for i=1:10
        try
         res=200;
