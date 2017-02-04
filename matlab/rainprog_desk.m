@@ -13,22 +13,28 @@ if ~strcmp(computer, 'GLNXA64')
         range=ncread(filepath,'range');
     end
 else
-    filepath='/home/zmaw/u300675/pattern_data/m4t_BKM_wrx00_l2_dbz_v00_20130511160000.nc';       %Simon work mac
+    filepath='/home/zmaw/u300675/pattern_data/m4t_BKM_wrx00_l2_dbz_v00_20130511170000.nc';       %Simon work mac
     data=ncread(filepath,'dbz_ac1');
     azi=ncread(filepath,'azi');
     range=ncread(filepath,'range');
 end
+
+%m4t_BKM_wrx00_l2_dbz_v00_20130426190000.nc no precipitation at all
+
 %Variables
+
+
+
 %Gridvars:
 res=200; % horizontal resolution for the cartesian grid
-timesteps=80; % Number of timesteps
+timesteps=20; % Number of timesteps
 small_val=2; % small value for the mean - TO BE DISCUSSED
 rain_threshold=0.1; % rain threshold
 gif=0; % boolean for gif
 time=1;
-prog=50; % starttime of the prognosis
-uk=10; % Number of interpolation points
-progtime=30; % how many timesteps for the prognosis
+prog=10; % starttime of the prognosis
+uk=5; % Number of interpolation points
+progtime=5; % how many timesteps for the prognosis
 U=5.7; % speed of the blob
 V=5.3; % speed of the blob
 x0=60; % startposition of the blob
@@ -73,7 +79,7 @@ max_y=zeros(1,3);
 
 %transformation from polar to cartesian
 %scatteredinterpolant wurde als schei�e considered
-parfor i=1:timesteps
+for i=1:timesteps
     tic
     data(:,:,i)=0.0364633*(10.^(data(:,:,i)/10)).^0.625;
     data_car{i}= griddata(x,y,data(:,:,i),X,Y);
@@ -94,6 +100,15 @@ for i=1:timesteps
     end
     
     nested_data(2*c_range+1:2*c_range+d_s,2*c_range+1:2*c_range+d_s,i)= data_car{i};
+    
+%     mean_2(i)=mean2(nested_data(:,:,i));
+%     max_2(i)=max(max(nested_data(:,:,i)));
+%     
+%     if max(max(nested_data(:,:,prog)))<rain_threshold*2
+%         co1=NaN(progtime-1,1);
+%         co2=NaN(progtime-1,1);
+%         return 
+%     end
     d_n=length(nested_data);
     for q = 1:4
         if q == 1
@@ -162,6 +177,9 @@ for i=1:timesteps-1
     hold on
     tic
     
+        
+ 
+    
     for q=1:4
         try
             if i ~=1
@@ -209,7 +227,6 @@ for i=1:timesteps-1
             data_area=nested_data((c_max{i}(q,2)-c_range*2):(c_max{i}(q,2)+c_range*2),(c_max{i}(q,1)-c_range*2):(c_max{i}(q,1)+c_range*2),i+1);
             
             C=LeastSquareCorr(data_area,corr_area);
-            clear data_area; clear corr_area;
             [ssr,snd]=min(C(:));
             [y_,x_]=ind2sub(size(C),snd);
             
