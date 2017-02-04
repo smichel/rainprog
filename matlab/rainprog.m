@@ -69,7 +69,8 @@ end
 %setting nans to 0
 
 % data_car=blobmaker(U,V,60,60,res,10,5,timesteps);
-
+mean_2=zeros(timesteps,1);
+max_2=zeros(timesteps,1);
 for i=1:timesteps
     for j=1:length(data_car{i})
         for o=1:length(data_car{i})
@@ -83,7 +84,7 @@ for i=1:timesteps
     mean_2(i)=mean2(nested_data(:,:,i));
     max_2(i)=max(max(nested_data(:,:,i)));
     
-    if max(max(nested_data(:,:,prog)))<rain_threshold*2
+    if i == prog & max(max(nested_data(:,:,prog)))<rain_threshold*2
         co1=NaN(progtime-1,1);
         co2=NaN(progtime-1,1);
         return 
@@ -137,15 +138,15 @@ end
 o=0;
 Contours=[0.1 0.2 0.5 1 2 5 10 100];
 %figure
-l_len=nan(120,4);
-l_alpha=nan(120,4);
-l_beta=nan(120,4);
-l_alpha360=nan(120,4);
-alpha_flag=nan(120,4);
+l_len=nan(timesteps,4);
+l_alpha=nan(timesteps,4);
+l_beta=nan(timesteps,4);
+l_alpha360=nan(timesteps,4);
+alpha_flag=nan(timesteps,4);
 better_beta_parameter=80;
-v=nan(120,1);
+v=nan(timesteps,1);
 dist=nan(4,1);
-dir=nan(120,1);
+dir=nan(timesteps,1);
 pause(5)
 for i=1:timesteps-1
 %    contourf(log(nested_data(:,:,i)),log(Contours))
@@ -377,9 +378,7 @@ if ~isnan(delta_x) || ~isnan(delta_y)
 %    caxis(log([Contours(1) Contours(length(Contours))]));
 %    colorbar('FontSize',12,'YTick',log(Contours),'YTickLabel',Contours);
 %    hold on
-    if k== timesteps-prog-1
-        break
-    end
+
     if gif == 1
         drawnow
         frame = getframe(1);
@@ -396,25 +395,25 @@ end
 %% data evaluation
 
 real_data=cut_data(:,:,prog:end);
-prognosis_data=prog_data(:,:,1:end-1);
 
-for i=1:size(prognosis_data,3)
-    real_data(:,:,i)=real_data(:,:,i)+NaNmask(real_data(:,:,i),prognosis_data(:,:,i));
+
+for i=1:size(prog_data,3)
+    real_data(:,:,i)=real_data(:,:,i)+NaNmask(real_data(:,:,i),prog_data(:,:,i));
 end
 
- for i=1:size(prognosis_data,3)
-    co1(i)=NaNcorr(real_data(:,:,i),prognosis_data(:,:,i));
+ for i=1:size(prog_data,3)
+    co1(i)=NaNcorr(real_data(:,:,i),prog_data(:,:,i));
     
     real_ones_data=real_data(:,:,i);
     real_ones_data=real_ones_data(:);
     real_ones_data(real_ones_data>0.1)=1;
     real_ones_data(real_ones_data<=0.1)=0;
     
-    prognosis_ones_data=prognosis_data(:,:,i);
-    prognosis_ones_data=prognosis_ones_data(:);
-    prognosis_ones_data(prognosis_ones_data>0.1)=1;
-    prognosis_ones_data(prognosis_ones_data<=0.1)=0;
-    co2(i)=NaNcorr(real_ones_data,prognosis_ones_data);
+    prog_ones_data=prog_data(:,:,i);
+    prog_ones_data=prog_ones_data(:);
+    prog_ones_data(prog_ones_data>0.1)=1;
+    prog_ones_data(prog_ones_data<=0.1)=0;
+    co2(i)=NaNcorr(real_ones_data,prog_ones_data);
  end
 
 end

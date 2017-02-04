@@ -406,9 +406,7 @@ if ~isnan(delta_x) || ~isnan(delta_y)
     caxis(log([Contours(1) Contours(length(Contours))]));
     colorbar('FontSize',12,'YTick',log(Contours),'YTickLabel',Contours);
     hold on
-    if k== timesteps-prog-1
-        break
-    end
+
     pause(0.5)
     if gif == 1
         drawnow
@@ -427,7 +425,7 @@ end
 %% data evaluation
 
 real_data=cut_data(:,:,prog:end);
-prognosis_data=prog_data(:,:,1:end-1);
+prognosis_data=prog_data(:,:,:);
 
 for i=1:size(prognosis_data,3)
     real_data(:,:,i)=real_data(:,:,i)+NaNmask(real_data(:,:,i),prognosis_data(:,:,i));
