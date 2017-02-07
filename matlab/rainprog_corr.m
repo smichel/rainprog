@@ -41,14 +41,14 @@ for j=1:size(co1,1)
             if co2{j,i}(1)>0.3
                 cor2(j,i,k)=co2{j,i}(k);
             else
-                cor1(j,i,k)=NaN;
+                cor2(j,i,k)=NaN;
             end
         end
     end
 end
-save('200m,24_files,HWT+BKM.mat');
 
-if plots==1
+
+
 figure
 plot(0.5,'k')
 hold on
@@ -73,14 +73,29 @@ plot(0.5,'k')
 hold on
 k=1;
 
+figure
+plot(0.5,'k')
+hold on
+for j=1:size(co1,1)
+    for i=1:size(co1,2)
+        for k=1:size(co1{j,i},2)
+            if co2{j,i}(1)>0.3
+                plot(co2{j,i},'Color',colors(j,:),'LineWidth',2)
+            end
+        end
+    end
+end
+
 plot(squeeze(mean(mean(cor2(:,:,:),2,'omitnan'),'omitnan')),'Color',[0 0 0],'LineWidth',5)
 title('Korrelationskoeffizient Auftreten von Regen')
 xlabel('Zeit in 30s')
 ylabel('Korrelationskoeffizient')
 legend('Mittelwert')
+
 figure
 plot(squeeze(mean(mean(cor1(:,:,:),2,'omitnan'),'omitnan'))-squeeze(mean(mean(cor2(:,:,:),2,'omitnan'),'omitnan')))
 title('Korrelationskoeffizient Regenintensität - Korrelationskoeffizient Auftreten von Regen')
 xlabel('Zeit in 30s')
 ylabel('Korrelationskoeffizient')
-end
+
+%save('200m,24_files,HWT+BKM.mat');
