@@ -1,7 +1,7 @@
 close all; clear;
 %E:/Rainprog/m4t_BKM_wrx00_l2_dbz_v00_20130511170000.nc
-%path=strcat('/home/zmaw/u300675/pattern_data/');
-path=strcat('E:/Rainprog/data/');
+path=strcat('/home/zmaw/u300675/pattern_data/');
+%path=strcat('E:/Rainprog/data/');
 files=dir(path);
 files=files(3:end);
 len=length(files);
