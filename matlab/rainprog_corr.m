@@ -16,13 +16,16 @@ parfor j=1:len
         prog=(i+4)*5;
         uk=7;
         timesteps=prog+progtime+5;
-        [real_data{j,i},prog_data{j,i}]=rainprog(rain_threshold,res,timesteps,prog,progtime,uk,strcat(path,files(j).name));
+        [S{j,i},A{j,i},L{j,i},L_1{j,i},L_2{j,i}]=rainprog(rain_threshold,res,timesteps,prog,progtime,uk,strcat(path,files(j).name));
        catch
-            real_data{j,i}=[];
-            prog_data{j,i}=[];
+            S{j,i}=[];
+            A{j,i}=[];
+            L{j,i}=[];
+            L_1{j,i}=[];
+            L_2{j,i}=[];
         end
     end
     %display(sprintf('Progress %d%%',floor(j/len*100)));
 end
 
-save('HWT+BKM.mat');
+save('SAL_HWT+BKM.mat');

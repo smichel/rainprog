@@ -1,4 +1,4 @@
-function [ real_data,prog_data ] = rainprog(rain_threshold,res,timesteps,prog,progtime,uk,filepath )
+function [ S,A,L,L_1,L_2 ] = rainprog(rain_threshold,res,timesteps,prog,progtime,uk,filepath )
 data=ncread(filepath,'dbz_ac1');
 azi=ncread(filepath,'azi');
 range=ncread(filepath,'range');
@@ -400,6 +400,8 @@ real_data=cut_data(:,:,prog:end);
 for i=1:size(prog_data,3)
     real_data(:,:,i)=real_data(:,:,i)+NaNmask(real_data(:,:,i),prog_data(:,:,i));
 end
+
+[ S,A,L,L_1,L_2 ] = SAL_score(prog_data,real_data);
 
 % for i=1:size(prog_data,3)
 %     co1(i)=NaNcorr(real_data(:,:,i),prog_data(:,:,i));

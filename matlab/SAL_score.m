@@ -1,16 +1,15 @@
-clear;close all;
-load('E:/Rainprog/HWT+BKM.mat');
+function [ S,A,L,L_1,L_2 ] = SAL_score(prog_data,real_data)
 
-timesteps=size(prognosis_data,3);
+timesteps=size(prog_data,3);
 real_data=real_data(:,:,1:timesteps);
-res=40000/(size(prognosis_data,1)-1);
+res=40000/(size(prog_data,1)-1);
 
-p_data=reshape(prognosis_data,size(prognosis_data,1)*size(prognosis_data,2),timesteps);
+p_data=reshape(prog_data,size(prog_data,1)*size(prog_data,2),timesteps);
 p_data_vals=p_data;
 p_data(isnan(p_data))=0;
 p_data(p_data<0.01)=0;
 p_data(p_data>=0.01)=1;
-p_data=reshape(p_data,size(prognosis_data,1),size(prognosis_data,2),timesteps);
+p_data=reshape(p_data,size(prog_data,1),size(prog_data,2),timesteps);
 
 p_CC=cell(timesteps,1);
 p_RR_sum=zeros(timesteps,1);
@@ -86,7 +85,7 @@ for i=1:timesteps
                 p_cell_y{i,j}=mod(p_CC{i}.PixelIdxList{j},res+1);
                 img=zeros(201);
                 for cell_size=1:length(p_cell_x{i,j})
-                    img(p_cell_x{i,j}(cell_size),p_cell_y{i,j}(cell_size))=prognosis_data(p_cell_x{i,j}(cell_size),p_cell_y{i,j}(cell_size),i);
+                    img(p_cell_x{i,j}(cell_size),p_cell_y{i,j}(cell_size))=prog_data(p_cell_x{i,j}(cell_size),p_cell_y{i,j}(cell_size),i);
                 end
                 weightedx = x .* img;
                 weightedy = y .* img;
@@ -96,7 +95,7 @@ for i=1:timesteps
         end
         
     end
-    img=prognosis_data(:,:,i);
+    img=prog_data(:,:,i);
     weightedx = x .* img;
     weightedy = y .* img;
     p_xcenter(i) = sum(weightedx(:),'omitnan') / sum(img(:),'omitnan');
@@ -144,12 +143,13 @@ for i=1:timesteps
     L(i)=L_1(i)+L_2(i);
 end
 
-scatter(S,A,30,L,'filled')
-colorbar
-xlim([-2 2])
-ylim([-2 2])
-caxis([-2 2])
-
-v = get(gca);
-lh = line([0 0 NaN v.XLim],[v.YLim NaN 0 0 ])
-set(lh,'Color',[.25 .25 .25],'LineStyle',':')
+% scatter(S,A,30,L,'filled')
+% colorbar
+% xlim([-2 2])
+% ylim([-2 2])
+% caxis([-2 2])
+% 
+% v = get(gca);
+% lh = line([0 0 NaN v.XLim],[v.YLim NaN 0 0 ])
+% set(lh,'Color',[.25 .25 .25],'LineStyle',':')
+end
