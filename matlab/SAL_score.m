@@ -1,5 +1,5 @@
 clear;close all;
-load('SAL_data.mat');
+load('E:/Rainprog/HWT+BKM.mat');
 
 timesteps=size(prognosis_data,3);
 real_data=real_data(:,:,1:timesteps);
