@@ -7,7 +7,7 @@ if ~strcmp(computer, 'GLNXA64')
         azi=ncread(filepath,'azi');
         range=ncread(filepath,'range');
     catch
-        filepath='E:/Rainprog/m4t_BKM_wrx00_l2_dbz_v00_20130511170000.nc';     %Simon home PC
+        filepath='E:/Rainprog/data/m4t_BKM_wrx00_l2_dbz_v00_20130511210000.nc';     %Simon home PC
         data=ncread(filepath,'dbz_ac1');
         azi=ncread(filepath,'azi');
         range=ncread(filepath,'range');
@@ -27,14 +27,14 @@ end
 
 %Gridvars:
 res=200; % horizontal resolution for the cartesian grid
-timesteps=20; % Number of timesteps
+timesteps=120; % Number of timesteps
 small_val=2; % small value for the mean - TO BE DISCUSSED
 rain_threshold=0.1; % rain threshold
 gif=0; % boolean for gif
 time=1;
-prog=10; % starttime of the prognosis
+prog=70; % starttime of the prognosis
 uk=5; % Number of interpolation points
-progtime=5; % how many timesteps for the prognosis
+progtime=30; % how many timesteps for the prognosis
 U=5.7; % speed of the blob
 V=5.3; % speed of the blob
 x0=60; % startposition of the blob

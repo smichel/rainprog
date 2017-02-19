@@ -1,4 +1,4 @@
-function [ co1,co2 ] = rainprog(rain_threshold,res,timesteps,prog,progtime,uk,filepath )
+function [ real_data,prog_data ] = rainprog(rain_threshold,res,timesteps,prog,progtime,uk,filepath )
 data=ncread(filepath,'dbz_ac1');
 azi=ncread(filepath,'azi');
 range=ncread(filepath,'range');
@@ -401,20 +401,20 @@ for i=1:size(prog_data,3)
     real_data(:,:,i)=real_data(:,:,i)+NaNmask(real_data(:,:,i),prog_data(:,:,i));
 end
 
- for i=1:size(prog_data,3)
-    co1(i)=NaNcorr(real_data(:,:,i),prog_data(:,:,i));
-    
-    real_ones_data=real_data(:,:,i);
-    real_ones_data=real_ones_data(:);
-    real_ones_data(real_ones_data>0.1)=1;
-    real_ones_data(real_ones_data<=0.1)=0;
-    
-    prog_ones_data=prog_data(:,:,i);
-    prog_ones_data=prog_ones_data(:);
-    prog_ones_data(prog_ones_data>0.1)=1;
-    prog_ones_data(prog_ones_data<=0.1)=0;
-    co2(i)=NaNcorr(real_ones_data,prog_ones_data);
- end
+% for i=1:size(prog_data,3)
+%     co1(i)=NaNcorr(real_data(:,:,i),prog_data(:,:,i));
+%     
+%     real_ones_data=real_data(:,:,i);
+%     real_ones_data=real_ones_data(:);
+%     real_ones_data(real_ones_data>0.1)=1;
+%     real_ones_data(real_ones_data<=0.1)=0;
+%     
+%     prog_ones_data=prog_data(:,:,i);
+%     prog_ones_data=prog_ones_data(:);
+%     prog_ones_data(prog_ones_data>0.1)=1;
+%     prog_ones_data(prog_ones_data<=0.1)=0;
+%     co2(i)=NaNcorr(real_ones_data,prog_ones_data);
+% end
 
 end
 
