@@ -9,9 +9,10 @@ t_len=5;
 progtime=30;
 plots=0;
 rain_threshold=0.2; % rain threshold
+
 parfor j=1:len
     for i=1:10
-       try
+      try
         res=200;
         prog=(i+4)*5;
         uk=7;

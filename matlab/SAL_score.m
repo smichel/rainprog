@@ -51,6 +51,9 @@ for i=1:timesteps
                 r_cell_y{i,j}=mod(r_CC{i}.PixelIdxList{j},res+1);
                 img=zeros(201);
                 for cell_size=1:length(r_cell_x{i,j})
+                    if r_cell_y{i,j}(cell_size)==0 
+                        r_cell_y{i,j}(cell_size)=201; 
+                    end
                     img(r_cell_x{i,j}(cell_size),r_cell_y{i,j}(cell_size))=real_data(r_cell_x{i,j}(cell_size),r_cell_y{i,j}(cell_size),i);
                 end
                 weightedx = x .* img;
@@ -85,6 +88,9 @@ for i=1:timesteps
                 p_cell_y{i,j}=mod(p_CC{i}.PixelIdxList{j},res+1);
                 img=zeros(201);
                 for cell_size=1:length(p_cell_x{i,j})
+                    if p_cell_y{i,j}(cell_size)==0 
+                        p_cell_y{i,j}(cell_size)=201; 
+                    end
                     img(p_cell_x{i,j}(cell_size),p_cell_y{i,j}(cell_size))=prog_data(p_cell_x{i,j}(cell_size),p_cell_y{i,j}(cell_size),i);
                 end
                 weightedx = x .* img;
