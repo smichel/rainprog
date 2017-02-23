@@ -1,4 +1,4 @@
-function [ S,A,L,L_1,L_2 ] = rainprog(rain_threshold,res,timesteps,prog,progtime,uk,filepath )
+function [FSS,rain_thresholds,max_boxsize, S,A,L,L_1,L_2 ] = rainprog(rain_threshold,res,timesteps,prog,progtime,uk,filepath )
 data=ncread(filepath,'dbz_ac1');
 azi=ncread(filepath,'azi');
 range=ncread(filepath,'range');
@@ -402,7 +402,7 @@ for i=1:size(prog_data,3)
 end
 
 [ S,A,L,L_1,L_2 ] = SAL_score(prog_data,real_data);
-
+[FSS,rain_thresholds,max_boxsize] = FSS(prog_data,real_data);
 % for i=1:size(prog_data,3)
 %     co1(i)=NaNcorr(real_data(:,:,i),prog_data(:,:,i));
 %     

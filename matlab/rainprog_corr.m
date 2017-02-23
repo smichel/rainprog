@@ -8,7 +8,7 @@ len=length(files);
 t_len=5;
 progtime=30;
 plots=0;
-rain_threshold=0.2; % rain threshold
+rain_threshold=0.02; % rain threshold
 
 parfor j=1:len
     for i=1:10
@@ -17,16 +17,19 @@ parfor j=1:len
         prog=(i+4)*5;
         uk=7;
         timesteps=prog+progtime+5;
-        [S{j,i},A{j,i},L{j,i},L_1{j,i},L_2{j,i}]=rainprog(rain_threshold,res,timesteps,prog,progtime,uk,strcat(path,files(j).name));
+        [FSS{j,i},rain_thresholds{j,i},max_boxsize{j,i},S{j,i},A{j,i},L{j,i},L_1{j,i},L_2{j,i}]=rainprog(rain_threshold,res,timesteps,prog,progtime,uk,strcat(path,files(j).name));
        catch
             S{j,i}=[];
             A{j,i}=[];
             L{j,i}=[];
             L_1{j,i}=[];
             L_2{j,i}=[];
+            FSS{j,i}=[];
+            rain_thresholds{j,i}=[];
+            max_boxsize{j,i}=[];
         end
     end
     %display(sprintf('Progress %d%%',floor(j/len*100)));
 end
 
-save('SAL_HWT+BKM.mat');
+save('SAL+FSS.mat');
