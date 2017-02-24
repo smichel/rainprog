@@ -6,10 +6,10 @@ function [FSS,rain_thresholds,max_boxsize] = FSS(prog_data,real_data)
 
 A=exist('res');
 if ~A
-    res=size(prog_data{1,1},1);
+    res=size(prog_data,1);
 end
 plot=0;
-time=size(prog_data{1,1},3);
+time=size(prog_data,3);
 
 r=1; % idx for rain_threshold
 
@@ -19,8 +19,8 @@ FSS=zeros(max_boxsize,length(rain_thresholds),time); %Fraction Skill Score
 for boxsize=1:floor(max_boxsize/10):max_boxsize
     b=1; % idx for box_size
     for rain_threshold=rain_thresholds
-        p_data=prog_data{2,1};
-        r_data=real_data{2,1};
+        p_data=prog_data;
+        r_data=real_data;
         for i=1:time
             p_box=zeros(ceil(res/boxsize),ceil(res/boxsize));
             r_box=zeros(ceil(res/boxsize),ceil(res/boxsize));
