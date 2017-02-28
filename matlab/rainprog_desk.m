@@ -71,6 +71,8 @@ data_car=cell(timesteps,1);
 maxima=cell(timesteps,1);
 c_max=cell(timesteps,1);
 nested_data= zeros(d_s+4*c_range,d_s+4*c_range,timesteps);
+z=zeros(333,360,timesteps);
+R=zeros(333,360,timesteps);
 for i = 1:timesteps
     maxima{i}=zeros(1,3);
 end
@@ -81,8 +83,25 @@ max_y=zeros(1,3);
 %scatteredinterpolant wurde als schei�e considered
 for i=1:timesteps
     tic
-    data(:,:,i)=0.0364633*(10.^(data(:,:,i)/10)).^0.625;
-    data_car{i}= griddata(x,y,data(:,:,i),X,Y);
+    z(:,:,i)=10.^(data(:,:,i)/10);
+    for theta=1:360
+        for r=1:333
+            if data(r,theta,i)<=36.5
+                a=320;b=1.4;
+                R(r,theta,i)=(z(r,theta,i)/a)^(1/b);
+            elseif data(r,theta,i)> 36.5 & data(r,theta,i) <= 44.0
+                a=200;b=1.6;
+                R(r,theta,i)=(z(r,theta,i)/a)^(1/b);
+            else
+                    a=77;b=1.9;
+                R(r,theta,i)=(z(r,theta,i)/a)^(1/b);
+            end
+            
+        end
+    end
+            
+    %data(:,:,i)=0.0364633*(10.^(data(:,:,i)/10)).^0.625;
+    data_car{i}= griddata(x,y,R(:,:,i),X,Y);
     %data_car{i}=0.0364633*(10^(data_car{i}/10))^0.625;
     toc
 end

@@ -14,7 +14,7 @@ time=size(prog_data,3);
 r=1; % idx for rain_threshold
 
 max_boxsize=(res-1)/10;
-rain_thresholds=[0.002 0.005 0.01 0.2 0.5 1 2 5 10 20 30];
+rain_thresholds=[0.1 0.2 0.5 1 2 5 10 20 30];
 FSS=zeros(max_boxsize,length(rain_thresholds),time); %Fraction Skill Score
 for boxsize=1:floor(max_boxsize/10):max_boxsize
     b=1; % idx for box_size
