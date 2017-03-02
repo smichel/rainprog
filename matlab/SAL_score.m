@@ -31,8 +31,8 @@ r_ycenter=zeros(timesteps,1);
 p_xcenter=zeros(timesteps,1);
 p_ycenter=zeros(timesteps,1);
 
-r_V=zeros(30,1);
-p_V=zeros(30,1);
+r_V=zeros(timesteps,1);
+p_V=zeros(timesteps,1);
 
 for i=1:timesteps
     r_CC{i}=bwconncomp(r_data(:,:,i));
