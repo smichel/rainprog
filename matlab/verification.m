@@ -1,5 +1,5 @@
 function [BIAS,CSI,FAR,ORSS,PC,POD,hit,miss,f_alert,corr_zero]=verification(prog_data,real_data)
-%for documentation see master thesis: Niederschlags-Nowcasting für ein
+%for documentation see master thesis: Niederschlags-Nowcasting fuer ein
 %hochaufgeloestes X-Band Regenradar from Timur Eckmann
 
 
