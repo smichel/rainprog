@@ -13,7 +13,7 @@ if ~strcmp(computer, 'GLNXA64')
         range=ncread(filepath,'range');
     end
 else
-    filepath='/home/zmaw/u300675/pattern_data/m4t_BKM_wrx00_l2_dbz_v00_20130511170000.nc';       %Simon work mac
+    filepath='/home/zmaw/u300675/pattern_data/m4t_HWT_wrx00_l2_dbz_v00_20130622200000.nc';       %Simon work mac
     data=ncread(filepath,'dbz_ac1');
     azi=ncread(filepath,'azi');
     range=ncread(filepath,'range');
@@ -32,9 +32,9 @@ small_val=2; % small value for the mean - TO BE DISCUSSED
 rain_threshold=0.1; % rain threshold
 gif=0; % boolean for gif
 time=1;
-prog=70; % starttime of the prognosis
+prog=30; % starttime of the prognosis
 uk=5; % Number of interpolation points
-progtime=30; % how many timesteps for the prognosis
+progtime=60; % how many timesteps for the prognosis
 U=5.7; % speed of the blob
 V=5.3; % speed of the blob
 x0=60; % startposition of the blob
