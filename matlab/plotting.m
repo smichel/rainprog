@@ -5,7 +5,7 @@ load('verification_60_timesteps.mat');
 PC_size=size(PC);
 rain_thresholds={'0.1 mm','0.2 mm','0.5 mm','1 mm','2 mm','5 mm','10 mm','20 mm','30 mm'};
 
-r_thrs=4; % Rain Threshold
+r_thrs=1; % Rain Threshold
 PC_=NaN(PC_size(1),PC_size(2),size(PC{2,2},2),size(PC{2,2},1));
 BIAS_=NaN(PC_size(1),PC_size(2),size(PC{2,2},2),size(PC{2,2},1));
 POD_=NaN(PC_size(1),PC_size(2),size(PC{2,2},2),size(PC{2,2},1));
@@ -164,18 +164,35 @@ legend('Hit','Miss','False Alert','Corr Zero','Total')
 
 
 figure
-plot(PC_a,'LineWidth',2)
+for i=1:size(PC_a,2)
+    plot(PC_a(:,i),'LineWidth',2,'Color',[0 (1/9)*i 0])
+    hold on
+end
 legend(rain_thresholds)
 title('Proportion Correct')
 figure
-plot(POD_a,'LineWidth',2)
+
+for i=1:size(PC_a,2)
+    plot(POD_a(:,i),'LineWidth',2,'Color',[0 (1/9)*i 0])
+    hold on
+end
+
 title('Propability of Detection')
 legend(rain_thresholds)
 figure
-plot(FAR_a,'LineWidth',2)
+
+for i=1:size(PC_a,2)
+    plot(FAR_a(:,i),'LineWidth',2,'Color',[0 (1/9)*i 0])
+    hold on
+end
 title('False Alarm Ratio')
 legend(rain_thresholds)
 figure
-plot(CSI_a,'LineWidth',2)
+
+for i=1:size(PC_a,2)
+    plot(CSI_a(:,i),'LineWidth',2,'Color',[0 (1/9)*i 0])
+    hold on
+end
+
 title('Criticial Success Index')
 legend(rain_thresholds)

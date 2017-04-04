@@ -74,7 +74,7 @@ for i=1:timesteps
                 a=200;b=1.6;
                 R(r,theta,i)=(z(r,theta,i)/a)^(1/b);
             else
-                    a=77;b=1.9;
+                a=77;b=1.9;
                 R(r,theta,i)=(z(r,theta,i)/a)^(1/b);
             end
             
@@ -82,7 +82,6 @@ for i=1:timesteps
     end
     %data(:,:,i)=0.0364633*(10.^(data(:,:,i)/10)).^0.625;
     data_car{i}= griddata(x,y,R(:,:,i),X,Y);
-    %data_car{i}=0.0364633*(10^(data_car{i}/10))^0.625;
 end
 %setting nans to 0
 
