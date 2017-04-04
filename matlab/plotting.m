@@ -165,7 +165,7 @@ legend('Hit','Miss','False Alert','Corr Zero','Total')
 
 figure
 for i=1:size(PC_a,2)
-    plot(PC_a(:,i),'LineWidth',2,'Color',[0 (1/9)*i 0])
+    plot(PC_a(:,i),'LineWidth',2,'Color',[(1/9)*i 0 0])
     hold on
 end
 legend(rain_thresholds)
@@ -173,7 +173,7 @@ title('Proportion Correct')
 figure
 
 for i=1:size(PC_a,2)
-    plot(POD_a(:,i),'LineWidth',2,'Color',[0 (1/9)*i 0])
+    plot(POD_a(:,i),'LineWidth',2,'Color',[(1/9)*i 0 0])
     hold on
 end
 
@@ -182,7 +182,7 @@ legend(rain_thresholds)
 figure
 
 for i=1:size(PC_a,2)
-    plot(FAR_a(:,i),'LineWidth',2,'Color',[0 (1/9)*i 0])
+    plot(FAR_a(:,i),'LineWidth',2,'Color',[(1/9)*i 0 0])
     hold on
 end
 title('False Alarm Ratio')
@@ -190,9 +190,22 @@ legend(rain_thresholds)
 figure
 
 for i=1:size(PC_a,2)
-    plot(CSI_a(:,i),'LineWidth',2,'Color',[0 (1/9)*i 0])
+    plot(CSI_a(:,i),'LineWidth',2,'Color',[(1/9)*i 0 0])
     hold on
 end
 
 title('Criticial Success Index')
 legend(rain_thresholds)
+
+% figure
+% 
+% for i=1:size(hit_a,2)
+%     plot(hit_a(:,i),'b')
+%     hold on
+%     plot(miss_a(:,i),'r')
+%     plot(f_alert_a(:,i),'y')
+%     plot(corr_zero_a(:,i),'m')
+% 
+% end
+% 
+%     plot(total_a(1,:)','g')
