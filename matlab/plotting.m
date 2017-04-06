@@ -61,6 +61,7 @@ miss_s=squeeze(sum(sum(miss_(:,:,r_thrs,:),'omitnan'),'omitnan'));
 f_alert_s=squeeze(sum(sum(f_alert_(:,:,r_thrs,:),'omitnan'),'omitnan'));
 corr_zero_s=squeeze(sum(sum(corr_zero_(:,:,r_thrs,:),'omitnan'),'omitnan'));
 
+
 total_s=hit_s+miss_s+f_alert_s+corr_zero_s;
 
 PC_s=(hit_s+corr_zero_s)./total_s;
@@ -72,6 +73,8 @@ hit_a=squeeze(sum(sum(hit_(:,:,:,:),'omitnan'),'omitnan'));
 miss_a=squeeze(sum(sum(miss_(:,:,:,:),'omitnan'),'omitnan'));
 f_alert_a=squeeze(sum(sum(f_alert_(:,:,:,:),'omitnan'),'omitnan'));
 corr_zero_a=squeeze(sum(sum(corr_zero_(:,:,:,:),'omitnan'),'omitnan'));
+
+BIAS_a=(hit_a+f_alert_a)./(hit_a+miss_a);
 
 total_a=hit_a+miss_a+f_alert_a+corr_zero_a;
 
@@ -195,6 +198,15 @@ for i=1:size(PC_a,2)
 end
 
 title('Criticial Success Index')
+legend(rain_thresholds)
+
+figure
+for i=1:size(PC_a,2)
+    plot(BIAS_a(:,i),'LineWidth',2,'Color',[(1/9)*i 0 0])
+    hold on
+end
+
+title('Frequency Bias')
 legend(rain_thresholds)
 
 % figure
