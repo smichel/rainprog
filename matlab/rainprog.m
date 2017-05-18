@@ -40,9 +40,7 @@ end
 
 
 %cartesian coordinatesystem
-x_car = -20000:res:20000;
-y_car = -20000:res:20000;
-[X,Y]= meshgrid(x_car,y_car);
+
 
 
 c_range=floor((length(X)-1)/12);
