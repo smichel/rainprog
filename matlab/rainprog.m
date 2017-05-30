@@ -383,6 +383,7 @@ if ~isnan(delta_x) || ~isnan(delta_y)
     prog_data(:,:,k)= griddata((x_car+delta_x*k)+delta_v(prog)*30*k*cosd(dir_bar(prog)+delta_dir(prog)*k),...
     (y_car+delta_y*k)+delta_v(prog)*30*k*sind(dir_bar(prog)+delta_dir(prog)*k),...
     cut_data(:,:,prog+1),X,Y,'natural');
+
     cut_data(:,:,prog+1+k)=cut_data(:,:,prog+1+k)+NaNmask(prog_data(:,:,k),cut_data(:,:,prog+1+k));
 %    contourf(log(prog_data(:,:,k)),log(Contours))
 %    hold on
