@@ -27,14 +27,14 @@ delta_dir=22.5;
 v_bar=400;
 v_bar_s=15;
 prog_data=zeros(40000/res+1,40000/res+1,progtime);
-for k=1:progtime*10
+for k=1:progtime
     tic
     prog_data(:,:,k)= griddata((x_car+delta_x*k)+delta_v*30*k*cosd(dir_bar+delta_dir*k),...
     (y_car+delta_y*k)+delta_v*30*k*sind(dir_bar+delta_dir*k),...
     cut_data(:,:,1),X,Y,'natural');
     toc
 end
-gif=1;
+gif=0;
 filename='test.gif';
 for k=1:progtime*10
 imagesc(prog_data(:,:,k))
