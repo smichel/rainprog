@@ -10,7 +10,7 @@ x = meshgrid(-N/2:N/2-1);
 d = hypot(x,x')+1e-5;
 Z = d.^(-alpha) .* exp(rand(N)*j*2*pi); % |Z(w)| = |w|^-a, phase(Z(w))=rand
 Z = ifftn(ifftshift(Z));
-Z=peaks(grid);
+%Z=peaks(grid);
 %nested_data=50.*rand(grid*grid,1);
 nested_data=reshape(abs(Z),[10000 1]);
 nested_data_2d=reshape(nested_data,[grid,grid]);
@@ -24,8 +24,8 @@ sorted(:,3)=ceil(I/100);
 
 sorted(sorted(:,3)==0,3)=100;
 
-c_range=20;
-num_maxes=8;
+c_range=10;
+num_maxes=10;
 maxima=zeros(num_maxes,3);
 maxima(1,1:3)=sorted(end,:);
 dummy=sorted;
@@ -43,7 +43,7 @@ for i=1:num_maxes
             l=l+1;
         end
     end
-    maxima(i+1,1:3)=sorted(pot_points(end),:);
+    maxima(i+1,1:3)=dummy(pot_points(end),:);
     dummy=sorted(pot_points,:);
     toc
     pot_points_b{i}=pot_points;
@@ -51,14 +51,14 @@ for i=1:num_maxes
     clear pot_points
 end
 figure
-imagesc(rot90(nested_data_2d,2))
+imagesc(nested_data_2d)
 hold on
 
 for i=1:num_maxes+1
     for j=1:num_maxes+1
        maxima(i,j+3)=sqrt((maxima(i,2)-maxima(j,2)).^2+(maxima(i,3)-maxima(j,3)).^2);
     end
-    plot(maxima(i,3),maxima(i,2),'w.','LineWidth',100)
+    plot(maxima(i,3),maxima(i,2),'r.','LineWidth',100)
     circle(maxima(i,3),maxima(i,2),c_range);
 end
 
