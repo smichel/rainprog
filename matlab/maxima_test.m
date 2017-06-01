@@ -24,8 +24,8 @@ sorted(:,3)=ceil(I/100);
 
 sorted(sorted(:,3)==0,3)=100;
 
-c_range=10;
-num_maxes=10;
+c_range=20;
+num_maxes=8;
 maxima=zeros(num_maxes,3);
 maxima(1,1:3)=sorted(end,:);
 dummy=sorted;
@@ -58,7 +58,7 @@ for i=1:num_maxes+1
     for j=1:num_maxes+1
        maxima(i,j+3)=sqrt((maxima(i,2)-maxima(j,2)).^2+(maxima(i,3)-maxima(j,3)).^2);
     end
-    plot(maxima(i,3),maxima(i,2),'r.','LineWidth',100)
+    plot(maxima(i,3),maxima(i,2),'rx','MarkerSize',20)
     circle(maxima(i,3),maxima(i,2),c_range);
 end
 
