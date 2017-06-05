@@ -7,7 +7,7 @@ if ~strcmp(computer, 'GLNXA64')
         azi=ncread(filepath,'azi');
         range=ncread(filepath,'range');
     catch
-        filepath='E:/Rainprog/data/m4t_BKM_wrx00_l2_dbz_v00_20130511210000.nc';     %Simon home PC
+        filepath='E:/Rainprog/data/m4t_BKM_wrx00_l2_dbz_v00_20130511160000.nc';     %Simon home PC
         data=ncread(filepath,'dbz_ac1');
         azi=ncread(filepath,'azi');
         range=ncread(filepath,'range');
@@ -27,14 +27,14 @@ end
 
 %Gridvars:
 res=200; % horizontal resolution for the cartesian grid
-timesteps=120; % Number of timesteps
+timesteps=30; % Number of timesteps
 small_val=2; % small value for the mean - TO BE DISCUSSED
 rain_threshold=0.1; % rain threshold
 gif=0; % boolean for gif
 time=1;
-prog=30; % starttime of the prognosis
+prog=15; % starttime of the prognosis
 uk=5; % Number of interpolation points
-progtime=60; % how many timesteps for the prognosis
+progtime=20; % how many timesteps for the prognosis
 U=5.7; % speed of the blob
 V=5.3; % speed of the blob
 x0=60; % startposition of the blob
@@ -64,11 +64,11 @@ y_car = -20000:res:20000;
 
 
 c_range=floor((length(X)-1)/12);
+num_maxes=3;
 d_s=length(X);
 
 %preallocating
 data_car=cell(timesteps,1);
-maxima=cell(timesteps,1);
 c_max=cell(timesteps,1);
 nested_data= zeros(d_s+4*c_range,d_s+4*c_range,timesteps);
 z=zeros(333,360,timesteps);
@@ -160,19 +160,20 @@ for i=1:timesteps
             max_x(q)=max_x(q)+((d_n-1)/2);
         end
     end
-    maxima{i}(1:4,1)=max_x;
-    maxima{i}(1:4,2)=max_y;
+    maxima{i}(1:4,2)=max_x;
+    maxima{i}(1:4,3)=max_y;
     for q=1:4
-        maxima{i}(q,3)=mean([nested_data(max_x(q),max_y(q),i),nested_data(max_x(q)+1,max_y(q),i),nested_data(max_x(q)+1,max_y(q)+1,i),nested_data(max_x(q)-1,max_y(q),i),nested_data(max_x(q)-1,max_y(q)-1,i)]);
+        maxima{i}(q,1)=mean([nested_data(max_x(q),max_y(q),i),nested_data(max_x(q)+1,max_y(q),i),nested_data(max_x(q)+1,max_y(q)+1,i),nested_data(max_x(q)-1,max_y(q),i),nested_data(max_x(q)-1,max_y(q)-1,i)]);
     end
 end
+maxima{1}=findMaxima(nested_data(:,:,1), c_range, num_maxes);
 
 %nesting the array into a bigger array
 
 
 
 for q=1:4
-    c_max{1}(q,1:1:2)=maxima{1}(q,2:-1:1);
+    c_max{1}(q,1:1:2)=maxima{1}(q,3:-1:2);
 end
 o=0;
 Contours=[0.1 0.2 0.5 1 2 5 10 100];
@@ -186,7 +187,7 @@ better_beta_parameter=80;
 v=nan(120,1);
 dist=nan(4,1);
 dir=nan(120,1);
-pause(5)
+%pause(5)
 for i=1:timesteps-1
     contourf(log(nested_data(:,:,i)),log(Contours))
     colorbar('YTick',log(Contours),'YTickLabel',Contours);
