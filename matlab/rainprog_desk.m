@@ -2,7 +2,7 @@ close all;
 clear;
 if ~strcmp(computer, 'GLNXA64')
     try
-        filepath='D:/Programmieren/Rain/m4t_BKM_wrx00_l2_dbz_v00_20130511160000.nc'; %Joscha home PC
+        filepath='C:/Users/Uni/Desktop/m4t_BKM_wrx00_l2_dbz_v00_20130424180000.nc'; %Joscha home PC
         data=ncread(filepath,'dbz_ac1');
         azi=ncread(filepath,'azi');
         range=ncread(filepath,'range');
@@ -119,7 +119,8 @@ for i=1:timesteps
     end
     
     nested_data(2*c_range+1:2*c_range+d_s,2*c_range+1:2*c_range+d_s,i)= data_car{i};
-    
+    d_n=length(nested_data);
+
 %     mean_2(i)=mean2(nested_data(:,:,i));
 %     max_2(i)=max(max(nested_data(:,:,i)));
 %     
@@ -128,43 +129,42 @@ for i=1:timesteps
 %         co2=NaN(progtime-1,1);
 %         return 
 %     end
-    d_n=length(nested_data);
-    for q = 1:4
-        if q == 1
-            x_q_s=((d_n-1)/2)+1;
-            x_q_e=d_n;
-            y_q_s=((d_n-1)/2)+1;
-            y_q_e=d_n;
-        elseif q==2
-            x_q_s=((d_n-1)/2)+1;
-            x_q_e=d_n;
-            y_q_s=1;
-            y_q_e=((d_n-1)/2);
-        elseif q==3
-            x_q_s=1;
-            x_q_e=((d_n-1)/2);
-            y_q_s=1;
-            y_q_e=((d_n-1)/2);
-        elseif q==4
-            x_q_s=1;
-            x_q_e=((d_n-1)/2);
-            y_q_s=((d_n-1)/2)+1;
-            y_q_e=d_n;
-        end
-        [~, max_y(q)]=max(max(nested_data(x_q_s:x_q_e,y_q_s:y_q_e,i)));
-        if q == 1 | q == 4
-            max_y(q)=max_y(q)+((d_n-1)/2);
-        end
-        [~, max_x(q)]=max(nested_data(x_q_s:x_q_e,max_y(q),i));
-        if q == 1 | q == 2
-            max_x(q)=max_x(q)+((d_n-1)/2);
-        end
-    end
-    maxima{i}(1:4,2)=max_x;
-    maxima{i}(1:4,3)=max_y;
-    for q=1:4
-        maxima{i}(q,1)=mean([nested_data(max_x(q),max_y(q),i),nested_data(max_x(q)+1,max_y(q),i),nested_data(max_x(q)+1,max_y(q)+1,i),nested_data(max_x(q)-1,max_y(q),i),nested_data(max_x(q)-1,max_y(q)-1,i)]);
-    end
+%     for q = 1:4
+%         if q == 1
+%             x_q_s=((d_n-1)/2)+1;
+%             x_q_e=d_n;
+%             y_q_s=((d_n-1)/2)+1;
+%             y_q_e=d_n;
+%         elseif q==2
+%             x_q_s=((d_n-1)/2)+1;
+%             x_q_e=d_n;
+%             y_q_s=1;
+%             y_q_e=((d_n-1)/2);
+%         elseif q==3
+%             x_q_s=1;
+%             x_q_e=((d_n-1)/2);
+%             y_q_s=1;
+%             y_q_e=((d_n-1)/2);
+%         elseif q==4
+%             x_q_s=1;
+%             x_q_e=((d_n-1)/2);
+%             y_q_s=((d_n-1)/2)+1;
+%             y_q_e=d_n;
+%         end
+%         [~, max_y(q)]=max(max(nested_data(x_q_s:x_q_e,y_q_s:y_q_e,i)));
+%         if q == 1 | q == 4
+%             max_y(q)=max_y(q)+((d_n-1)/2);
+%         end
+%         [~, max_x(q)]=max(nested_data(x_q_s:x_q_e,max_y(q),i));
+%         if q == 1 | q == 2
+%             max_x(q)=max_x(q)+((d_n-1)/2);
+%         end
+%     end
+%     maxima{i}(1:4,2)=max_x;
+%     maxima{i}(1:4,3)=max_y;
+%     for q=1:4
+%         maxima{i}(q,1)=mean([nested_data(max_x(q),max_y(q),i),nested_data(max_x(q)+1,max_y(q),i),nested_data(max_x(q)+1,max_y(q)+1,i),nested_data(max_x(q)-1,max_y(q),i),nested_data(max_x(q)-1,max_y(q)-1,i)]);
+%     end
 end
 maxima{1}=findMaxima(nested_data(:,:,1), c_range, num_maxes);
 

@@ -1,17 +1,12 @@
 function [ maxima ] = findMaxima( nested_data,c_range,num_maxes )
 %nested_data=nested_data(33:size(nested_data,1)-33,33:size(nested_data,1)-33,:);
 grid=size(nested_data,1);
-nested_data_2d=nested_data;
 nested_data=reshape(nested_data,[grid*grid 1]);
-
 
 sorted=zeros(grid*grid,3);
 [sorted(:,1),I]=sort(nested_data);
-sorted_2d=reshape(sorted(:,1),[grid, grid]);
-
 sorted(:,2)=mod(I,grid);
 sorted(:,3)=ceil(I/grid);
-
 sorted(sorted(:,2)==0,2)=grid;
 sorted(sorted(:,3)==0,3)=grid;
 
