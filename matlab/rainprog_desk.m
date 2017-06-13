@@ -27,12 +27,12 @@ end
 
 %Gridvars:
 res=200; % horizontal resolution for the cartesian grid
-timesteps=30; % Number of timesteps
+timesteps=25; % Number of timesteps
 small_val=2; % small value for the mean - TO BE DISCUSSED
 rain_threshold=0.1; % rain threshold
 gif=0; % boolean for gif
 time=1;
-prog=15; % starttime of the prognosis
+prog=10; % starttime of the prognosis
 uk=5; % Number of interpolation points
 progtime=20; % how many timesteps for the prognosis
 U=5.7; % speed of the blob
@@ -64,7 +64,7 @@ y_car = -20000:res:20000;
 
 
 c_range=floor((length(X)-1)/12);
-num_maxes=4;
+num_maxes=8;
 d_s=length(X);
 
 %preallocating
@@ -126,7 +126,7 @@ for i=1:timesteps
 %         co2=NaN(progtime-1,1);
 %         return 
 %     end
-%     for q = 1:4
+%     for q = 1:num_maxes
 %         if q == 1
 %             x_q_s=((d_n-1)/2)+1;
 %             x_q_e=d_n;
@@ -142,7 +142,7 @@ for i=1:timesteps
 %             x_q_e=((d_n-1)/2);
 %             y_q_s=1;
 %             y_q_e=((d_n-1)/2);
-%         elseif q==4
+%         elseif q==num_maxes
 %             x_q_s=1;
 %             x_q_e=((d_n-1)/2);
 %             y_q_s=((d_n-1)/2)+1;
@@ -180,14 +180,14 @@ maxima=findMaxima(maxima,nested_data(:,:,1), c_range, num_maxes);
 o=0;
 Contours=[0.1 0.2 0.5 1 2 5 10 100];
 figure
-l_len=nan(120,4);
-l_alpha=nan(120,4);
-l_beta=nan(120,4);
-l_alpha360=nan(120,4);
-alpha_flag=nan(120,4);
+l_len=nan(120,num_maxes);
+l_alpha=nan(120,num_maxes);
+l_beta=nan(120,num_maxes);
+l_alpha360=nan(120,num_maxes);
+alpha_flag=nan(120,num_maxes);
 better_beta_parameter=80;
 v=nan(120,1);
-dist=nan(4,1);
+dist=nan(num_maxes,1);
 dir=nan(120,1);
 %pause(5)
 for i=1:timesteps-1
@@ -266,7 +266,7 @@ for i=1:timesteps-1
             if alpha_flag(i,q)~=3
                 alpha_flag(i,q)=0;
             end
-            if ((maxima(q,3) == new_maxima(q,2)) & (maxima(q,2) == c_max{i+1}(q,2))) % when the position of c_max doesnt change after one timestep
+            if ((maxima(q,3) == new_maxima(q,3)) & (maxima(q,2) == new_maxima(q,2))) % when the position of c_max doesnt change after one timestep
                 new_maxima(q,1:3)=NaN;
                 alpha_flag(i+1,q)=NaN;
             end
@@ -285,7 +285,12 @@ for i=1:timesteps-1
             display(sprintf('Couldnt calculate the correlation for the quadrant %d at timestep %d',q,i));
             new_maxima(q,1:3)=NaN;
         end
+        
     end
+    maxima=new_maxima;
+    maxima(isnan(maxima))=[];
+    maxima=findMaxima(maxima,nested_data(:,:,i+1),c_range,num_maxes);
+    
     % anglechecking
     l_alpha360(i,:)=l_alpha(i,:);
     % 360� conversion for critical values
@@ -296,7 +301,7 @@ for i=1:timesteps-1
     end
     
     
-    for q=1:4
+    for q=1:num_maxes
         
         
         if l_alpha360(i,q) < 0 & (sum(l_alpha360(i,:),'omitnan')-l_alpha360(i,q)) < 0
@@ -345,7 +350,7 @@ for i=1:timesteps-1
         dir(i)=sum(l_alpha360(i,:).*(alpha_flag(i,:)==0),'omitnan')/sum(alpha_flag(i,:)==0,'omitnan');
     else
         
-        for q=1:4
+        for q=1:num_maxes
             if l_alpha360(i,q) > 180
                 l_alpha360(i,q)= l_alpha360(i,q)-360;
             end

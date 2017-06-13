@@ -13,7 +13,7 @@ sorted(sorted(:,3)==0,3)=grid;
 %maxima=zeros(num_maxes,3);
 %maxima(1,1:3)=sorted(end,:);
 dummy=sorted;
-for i=1:num_maxes-1
+for i=1:num_maxes-size(maxima,1)
     distance=zeros(size(dummy,1),i);
     for j=1:i
        distance(:,j)= sqrt((maxima(j,2)-dummy(:,2)).^2+(maxima(j,3)-dummy(:,3)).^2);
