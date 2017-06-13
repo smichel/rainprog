@@ -64,7 +64,7 @@ y_car = -20000:res:20000;
 
 
 c_range=floor((length(X)-1)/12);
-num_maxes=3;
+num_maxes=4;
 d_s=length(X);
 
 %preallocating
@@ -73,9 +73,6 @@ c_max=cell(timesteps,1);
 nested_data= zeros(d_s+4*c_range,d_s+4*c_range,timesteps);
 z=zeros(333,360,timesteps);
 R=zeros(333,360,timesteps);
-for i = 1:timesteps
-    maxima{i}=zeros(1,3);
-end
 max_x=zeros(1,3);
 max_y=zeros(1,3);
 
@@ -166,15 +163,20 @@ for i=1:timesteps
 %         maxima{i}(q,1)=mean([nested_data(max_x(q),max_y(q),i),nested_data(max_x(q)+1,max_y(q),i),nested_data(max_x(q)+1,max_y(q)+1,i),nested_data(max_x(q)-1,max_y(q),i),nested_data(max_x(q)-1,max_y(q)-1,i)]);
 %     end
 end
-maxima{1}=findMaxima(nested_data(:,:,1), c_range, num_maxes);
+
+maxima(1,1)=max(max(nested_data(:,:,1)));
+[~,maxima(1,3)]=max(max(nested_data(:,:,1)));
+[~,maxima(1,2)]=max(nested_data(:,maxima(1,3),1));
+maxima=findMaxima(maxima,nested_data(:,:,1), c_range, num_maxes);
 
 %nesting the array into a bigger array
 
 
 
-for q=1:4
-    c_max{1}(q,1:1:2)=maxima{1}(q,3:-1:2);
-end
+% for q=1:4
+%     c_max{1}(q,1:1:2)=maxima{1}(q,3:-1:2);
+% end
+
 o=0;
 Contours=[0.1 0.2 0.5 1 2 5 10 100];
 figure
@@ -196,44 +198,46 @@ for i=1:timesteps-1
     colorbar('FontSize',12,'YTick',log(Contours),'YTickLabel',Contours);
     hold on
     tic
-    
-        
- 
-    
-    for q=1:4
+    for q=1:num_maxes
         try
             if i ~=1
                 try
-                    if nested_data(c_max{i}(q,2),c_max{i}(q,1),i) == 0  ...% when c_max rans out of the circle of data
-                            | nested_data(c_max{i}(q,2),c_max{i}(q,1),i) < rain_threshold ...% when the value is too small
-                            | nested_data(c_max{i}(q,2),c_max{i}(q,1),i) / mean([nested_data(c_max{i}(q,2),c_max{i}(q,1),i),nested_data(c_max{i}(q,2)+1, ...
-                            c_max{i}(q,1),i),nested_data(c_max{i}(q,2)+1,c_max{i}(q,1)+1,i),nested_data(c_max{i}(q,2)-1,c_max{i}(q,1),i), ...
-                            nested_data(c_max{i}(q,2)-1,c_max{i}(q,1)-1,i)]) > small_val ... % when the mean around c_max is low - there is a high chance its scatter or some bullshit
+                    if nested_data(maxima(q,2),maxima(q,3),i) == 0  ...% when c_max rans out of the circle of data
+                            | nested_data(maxima(q,2),maxima(q,3),i) < rain_threshold ...% when the value is too small
+                            | nested_data(maxima(q,2),maxima(q,3),i) / mean([nested_data(maxima(q,2),maxima(q,3),i),nested_data(maxima(q,2)+1, ...
+                            maxima(q,3),i),nested_data(maxima(q,2)+1,maxima(q,3)+1,i),nested_data(maxima(q,2)-1,maxima(q,3),i), ...
+                            nested_data(maxima(q,2)-1,maxima(q,3)-1,i)]) > small_val ... % when the mean around c_max is low - there is a high chance its scatter or some bullshit
                             & nested_data(maxima{i}(q,1),maxima{i}(q,2),i) < rain_threshold % if maximum is too small in quadrant q
                         
-                        c_max{i}(q,1:1:2)=NaN;
+                        maxima(q,2:1:3)=NaN;
                         alpha_flag(i,q)=NaN;
                         
-                    elseif nested_data(c_max{i}(q,2),c_max{i}(q,1),i) == 0  ...% when c_max rans out of the circle of data
-                            | nested_data(c_max{i}(q,2),c_max{i}(q,1),i) < rain_threshold ...% when the value is too small
-                            | nested_data(c_max{i}(q,2),c_max{i}(q,1),i) / mean([nested_data(c_max{i}(q,2),c_max{i}(q,1),i),nested_data(c_max{i}(q,2)+1, ...
-                            c_max{i}(q,1),i),nested_data(c_max{i}(q,2)+1,c_max{i}(q,1)+1,i),nested_data(c_max{i}(q,2)-1,c_max{i}(q,1),i), ...
-                            nested_data(c_max{i}(q,2)-1,c_max{i}(q,1)-1,i)]) > small_val ... % when the mean around c_max is low - there is a high chance its scatter or some bullshit
+                    elseif nested_data(maxima(q,2),maxima(q,3),i) == 0  ...% when c_max rans out of the circle of data
+                            | nested_data(maxima(q,2),maxima(q,3),i) < rain_threshold ...% when the value is too small
+                            | nested_data(maxima(q,2),maxima(q,3),i) / mean([nested_data(maxima(q,2),maxima(q,3),i),nested_data(maxima(q,2)+1, ...
+                            maxima(q,3),i),nested_data(maxima(q,2)+1,maxima(q,3)+1,i),nested_data(maxima(q,2)-1,maxima(q,3),i), ...
+                            nested_data(maxima(q,2)-1,maxima(q,3)-1,i)]) > small_val ... % when the mean around c_max is low - there is a high chance its scatter or some bullshit
                             & nested_data(maxima{i}(q,1),maxima{i}(q,2),i) > rain_threshold % if maximum is too small in quadrant q
                         
-                        c_max{i}(q,1:1:2)=maxima{i}(q,2:-1:1);
+                        maxima(q,:)=[];
+                        maxima=findMaxima(maxima,nested_data(:,:,i),c_range,num_maxes);
                         alpha_flag(i,q)=3; % chose new maximum
                         display(sprintf('Chose a new maximum in quadrant %d at timestep %d',q,i));
                     end
                     
                 catch
-                    if isnan(c_max{i}(q,1)) & isnan(c_max{i}(q,2)) & nested_data(maxima{i}(q,1),maxima{i}(q,2),i) > rain_threshold
-                        c_max{i}(q,1:1:2)=maxima{i}(q,2:-1:1);
+                    if isnan(maxima(q,3)) & isnan(maxima(q,2)) & nested_data(maxima{i}(q,1),maxima{i}(q,2),i) > rain_threshold
+                        %c_max{i}(q,1:1:2)=maxima{i}(q,2:-1:1);
+                        maxima(q,:)=[];
+                        maxima=findMaxima(maxima,nested_data(:,:,i),c_range,num_maxes);
                         display(sprintf('Chose a new maximum in quadrant %d dat timestep %d',q,i));
                         alpha_flag(i,q)=3; % chose new maximum
                         
-                    elseif ~isnan(c_max{i}(q,1)) & ~isnan(c_max{i}(q,2)) & nested_data(maxima{i}(q,1),maxima{i}(q,2),i) < rain_threshold
-                        c_max{i+1}(q,1:1:2)=NaN;
+                    elseif ~isnan(maxima(q,3)) & ~isnan(maxima(q,2)) & nested_data(maxima{i}(q,1),maxima{i}(q,2),i) < rain_threshold
+                        
+                        maxima(q,:)=[];
+                        maxima=findMaxima(maxima,nested_data(:,:,i),c_range,num_maxes);
+                        %c_max{i+1}(q,1:1:2)=NaN;
                         display(sprintf('Couldnt find a new valid maximum in quadrant %d at timestep %d',q,i));
                         alpha_flag(i,q)=NaN;
                     end
@@ -242,38 +246,44 @@ for i=1:timesteps-1
             end
             
             
-            corr_area=nested_data((c_max{i}(q,2)-c_range):(c_max{i}(q,2)+c_range),(c_max{i}(q,1)-c_range):(c_max{i}(q,1)+c_range),i);
+            corr_area=nested_data((maxima(q,2)-c_range):(maxima(q,2)+c_range),(maxima(q,3)-c_range):(maxima(q,3)+c_range),i);
             
-            data_area=nested_data((c_max{i}(q,2)-c_range*2):(c_max{i}(q,2)+c_range*2),(c_max{i}(q,1)-c_range*2):(c_max{i}(q,1)+c_range*2),i+1);
+            data_area=nested_data((maxima(q,2)-c_range*2):(maxima(q,2)+c_range*2),(maxima(q,3)-c_range*2):(maxima(q,3)+c_range*2),i+1);
             
             C=LeastSquareCorr(data_area,corr_area);
             [ssr,snd]=min(C(:));
             [y_,x_]=ind2sub(size(C),snd);
             
-            c_max{i+1}(q,1)=c_max{i}(q,1)-3*c_range+x_-1;
-            c_max{i+1}(q,2)=c_max{i}(q,2)-3*c_range+y_-1;
+%             c_max{i+1}(q,1)=maxima(q,3)-3*c_range+x_-1;
+%             c_max{i+1}(q,2)=maxima(q,2)-3*c_range+y_-1;
+            
+            new_maxima(q,1)=nested_data(maxima(q,2)-3*c_range+y_-1,maxima(q,3)-3*c_range+x_-1,i);
+            new_maxima(q,2)=maxima(q,2)-3*c_range+y_-1;
+            new_maxima(q,3)=maxima(q,3)-3*c_range+x_-1;
+            
+            
             
             if alpha_flag(i,q)~=3
                 alpha_flag(i,q)=0;
             end
-            if ((c_max{i}(q,1) == c_max{i+1}(q,1)) & (c_max{i}(q,2) == c_max{i+1}(q,2))) % when the position of c_max doesnt change after one timestep
-                c_max{i+1}(q,1:1:2)=NaN;
+            if ((maxima(q,3) == new_maxima(q,2)) & (maxima(q,2) == c_max{i+1}(q,2))) % when the position of c_max doesnt change after one timestep
+                new_maxima(q,1:3)=NaN;
                 alpha_flag(i+1,q)=NaN;
             end
-            plot(c_max{i}(q,1),c_max{i}(q,2),'go','MarkerSize',20,'MarkerFaceColor','g')
-            plot(c_max{i+1}(q,1),c_max{i+1}(q,2),'bo','MarkerSize',20,'MarkerFaceColor','b')
+            plot(maxima(q,3),maxima(q,2),'go','MarkerSize',20,'MarkerFaceColor','g')
+            plot(new_maxima(q,3),new_maxima(q,2),'bo','MarkerSize',20,'MarkerFaceColor','b')
             
 
             
-            l_len(i,q)=sqrt((c_max{i}(q,1)-c_max{i+1}(q,1))^2+(c_max{i}(q,2)-c_max{i+1}(q,2))^2);
-            l_alpha(i,q)=atan2((c_max{i+1}(q,2)-c_max{i}(q,2)),(c_max{i+1}(q,1)-c_max{i}(q,1)))*180/pi;
-            l_beta(i,q)=(atan2((c_max{i+1}(q,2)-(size(nested_data(:,:,1),1))/2)-1,(c_max{i+1}(q,1)-(size(nested_data(:,:,1),1))/2)-1)*180/pi)+180;
+            l_len(i,q)=sqrt((maxima(q,3)-new_maxima(q,3))^2+(maxima(q,2)-new_maxima(q,2))^2);
+            l_alpha(i,q)=atan2((new_maxima(q,3)-maxima(q,3)),(new_maxima(q,2)-maxima(q,2)))*180/pi;
+            l_beta(i,q)=(atan2((new_maxima(q,3)-(size(nested_data(:,:,1),1))/2)-1,(new_maxima(q,2)-(size(nested_data(:,:,1),1))/2)-1)*180/pi)+180;
             
-            line([c_max{i+1}(q,1) c_max{i}(q,1) ],[c_max{i+1}(q,2) c_max{i}(q,2)],'LineWidth',5,'Color','k')
+            line([new_maxima(q,3) maxima(q,3) ],[new_maxima(q,2) maxima(q,2)],'LineWidth',5,'Color','k')
             line([ 50 + 40 * cosd(l_alpha(i,q)) 50] , [ 50 + 40 * sind(l_alpha(i,q)) 50],'LineWidth',5,'Color','k')
         catch
             display(sprintf('Couldnt calculate the correlation for the quadrant %d at timestep %d',q,i));
-            c_max{i+1}(q,1:1:2)=NaN;
+            new_maxima(q,1:3)=NaN;
         end
     end
     % anglechecking
@@ -300,7 +310,7 @@ for i=1:timesteps-1
             alpha_flag(i,q)=0;
         end
         
-        dist(q)=sqrt((c_max{i}(q,1)-ceil(d_n/2))^2+(c_max{i}(q,2)-ceil(d_n/2))^2)*res;
+        dist(q)=sqrt((maxima(q,3)-ceil(d_n/2))^2+(maxima(q,2)-ceil(d_n/2))^2)*res;
         if dist(q) > 19000 & alpha_flag(i,q)==0
                 
                 if (l_beta(i,q)-better_beta_parameter)>=0
@@ -364,7 +374,7 @@ for i=1:timesteps-1
         end
     end
     hold off
-    pause(time)
+    %pause(time)
     toc
     
 end

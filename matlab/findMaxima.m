@@ -1,4 +1,4 @@
-function [ maxima ] = findMaxima( nested_data,c_range,num_maxes )
+function [ maxima ] = findMaxima(maxima, nested_data,c_range,num_maxes)
 %nested_data=nested_data(33:size(nested_data,1)-33,33:size(nested_data,1)-33,:);
 grid=size(nested_data,1);
 nested_data=reshape(nested_data,[grid*grid 1]);
@@ -10,10 +10,10 @@ sorted(:,3)=ceil(I/grid);
 sorted(sorted(:,2)==0,2)=grid;
 sorted(sorted(:,3)==0,3)=grid;
 
-maxima=zeros(num_maxes,3);
-maxima(1,1:3)=sorted(end,:);
+%maxima=zeros(num_maxes,3);
+%maxima(1,1:3)=sorted(end,:);
 dummy=sorted;
-for i=1:num_maxes
+for i=1:num_maxes-1
     distance=zeros(size(dummy,1),i);
     for j=1:i
        distance(:,j)= sqrt((maxima(j,2)-dummy(:,2)).^2+(maxima(j,3)-dummy(:,3)).^2);
@@ -26,7 +26,8 @@ for i=1:num_maxes
             l=l+1;
         end
     end
-    maxima(i+1,1:3)=dummy(pot_points(end),:);
+    %maxima(i+1,1:3)=dummy(pot_points(end),:);
+    maxima=vertcat(maxima, dummy(pot_points(end),:));
     dummy=dummy(pot_points,:);
     clear pot_points
 end

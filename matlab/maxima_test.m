@@ -57,6 +57,9 @@ for i=1:num_maxes
     pot_points_b_{i}=pot_points_';
     clear pot_points
 %     figure
+
+
+end
 imagesc(nested_data_2d)
 hold on
 
@@ -68,6 +71,3 @@ for i=1:size(maxima,1)
     circle(maxima(i,3),maxima(i,2),c_range);
 end
 hold off
-end
-
-
