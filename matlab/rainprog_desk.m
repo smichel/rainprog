@@ -13,7 +13,7 @@ if ~strcmp(computer, 'GLNXA64')
         range=ncread(filepath,'range');
     end
 else
-    filepath='/home/zmaw/u300675/pattern_data/m4t_HWT_wrx00_l2_dbz_v00_20130622200000.nc';       %Simon work mac
+    filepath='/home/zmaw/u300675/pattern_data/m4t_BKM_wrx00_l2_dbz_v00_20130730200000.nc';       %Simon work mac
     data=ncread(filepath,'dbz_ac1');
     azi=ncread(filepath,'azi');
     range=ncread(filepath,'range');
@@ -27,7 +27,7 @@ end
 
 %Gridvars:
 res=200; % horizontal resolution for the cartesian grid
-timesteps=25; % Number of timesteps
+timesteps=35; % Number of timesteps
 small_val=2; % small value for the mean - TO BE DISCUSSED
 rain_threshold=0.1; % rain threshold
 gif=0; % boolean for gif
@@ -238,7 +238,7 @@ for i=1:timesteps-1
                         maxima(q,:)=[];
                         maxima=findMaxima(maxima,nested_data(:,:,i),c_range,num_maxes);
                         %c_max{i+1}(q,1:1:2)=NaN;
-                        display(sprintf('Couldnt find a new valid maximum in quadrant %d at timestep %d',q,i));
+                        %display(sprintf('Couldnt find a new valid maximum in quadrant %d at timestep %d',q,i));
                         alpha_flag(i,q)=NaN;
                     end
                 end
@@ -266,10 +266,10 @@ for i=1:timesteps-1
             if alpha_flag(i,q)~=3
                 alpha_flag(i,q)=0;
             end
-            if ((maxima(q,3) == new_maxima(q,3)) & (maxima(q,2) == new_maxima(q,2))) % when the position of c_max doesnt change after one timestep
-                new_maxima(q,1:3)=NaN;
-                alpha_flag(i+1,q)=NaN;
-            end
+%             if ((maxima(q,3) == new_maxima(q,3)) & (maxima(q,2) == new_maxima(q,2))) % when the position of c_max doesnt change after one timestep
+%                 new_maxima(q,1:3)=NaN;
+%                 alpha_flag(i+1,q)=NaN;
+%             end
             plot(maxima(q,3),maxima(q,2),'go','MarkerSize',20,'MarkerFaceColor','g')
             plot(new_maxima(q,3),new_maxima(q,2),'bo','MarkerSize',20,'MarkerFaceColor','b')
             
@@ -281,14 +281,16 @@ for i=1:timesteps-1
             
             line([new_maxima(q,3) maxima(q,3) ],[new_maxima(q,2) maxima(q,2)],'LineWidth',5,'Color','k')
             line([ 50 + 40 * cosd(l_alpha(i,q)) 50] , [ 50 + 40 * sind(l_alpha(i,q)) 50],'LineWidth',5,'Color','k')
+            
         catch
             display(sprintf('Couldnt calculate the correlation for the quadrant %d at timestep %d',q,i));
             new_maxima(q,1:3)=NaN;
         end
         
     end
+    pause(0.5)
     maxima=new_maxima;
-    maxima(isnan(maxima))=[];
+    maxima(isnan(maxima(:,1)),:)=[];
     maxima=findMaxima(maxima,nested_data(:,:,i+1),c_range,num_maxes);
     
     % anglechecking

@@ -11,7 +11,9 @@ sorted(sorted(:,2)==0,2)=grid;
 sorted(sorted(:,3)==0,3)=grid;
 
 %maxima=zeros(num_maxes,3);
-%maxima(1,1:3)=sorted(end,:);
+if isempty(maxima)
+    maxima(1,1:3)=sorted(end,:);
+end
 dummy=sorted;
 for i=1:num_maxes-size(maxima,1)
     distance=zeros(size(dummy,1),i);
