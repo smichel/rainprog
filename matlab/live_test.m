@@ -15,7 +15,7 @@ while true
         fileInfo=dir(name);
         timeStamp=fileInfo.date;
         prog_data=rainprog_live(res,progtime,rain_threshold,data,num_maxes);
-        ncid=netcdf.create('prog_data.nc','NOCLOBBER');
+        ncid=netcdf.create('/scratch/uni/u237/users/smichel/pattern_live/prog_data.nc','NOCLOBBER');
         dimidrow=netcdf.defDim(ncid,'rows',size(prog_data,1));
         dimidcol=netcdf.defDim(ncid,'clo',size(prog_data,2));
         varid=netcdf.defVar(ncid,'dbz_ac1','NC_DOUBLE',[dimidrow dimidcol]);
