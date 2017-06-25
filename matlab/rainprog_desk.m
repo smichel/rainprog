@@ -27,7 +27,7 @@ end
 
 %Gridvars:
 res=200; % horizontal resolution for the cartesian grid
-timesteps=35; % Number of timesteps
+timesteps=30; % Number of timesteps
 small_val=2; % small value for the mean - TO BE DISCUSSED
 rain_threshold=0.1; % rain threshold
 gif=0; % boolean for gif
@@ -167,7 +167,7 @@ end
 maxima(1,1)=max(max(nested_data(:,:,1)));
 [~,maxima(1,3)]=max(max(nested_data(:,:,1)));
 [~,maxima(1,2)]=max(nested_data(:,maxima(1,3),1));
-maxima=findMaxima(maxima,nested_data(:,:,1), c_range, num_maxes);
+maxima=findMaxima(maxima,nested_data(:,:,1), c_range, num_maxes,rain_threshold);
 
 %nesting the array into a bigger array
 
@@ -198,7 +198,7 @@ for i=1:timesteps-1
     colorbar('FontSize',12,'YTick',log(Contours),'YTickLabel',Contours);
     hold on
     tic
-    for q=1:num_maxes
+    for q=1:(size(maxima,1))
         try
             if i ~=1
                 try
@@ -303,13 +303,13 @@ for i=1:timesteps-1
     end
     
     
-    for q=1:num_maxes
+    for q=1:(size(maxima,1))
         
         
         if l_alpha360(i,q) < 0 & (sum(l_alpha360(i,:),'omitnan')-l_alpha360(i,q)) < 0
-            alpha = abs(l_alpha360(i,q)) - abs((sum(l_alpha360(i,:),'omitnan')-l_alpha360(i,q))/(3-sum(isnan(l_alpha360(i,:)))));
+            alpha = abs(l_alpha360(i,q)) - abs((sum(l_alpha360(i,:),'omitnan')-l_alpha360(i,q))/((size(maxima,1)-1)-sum(isnan(l_alpha360(i,:)))));
         else
-            alpha = l_alpha360(i,q) - (sum((l_alpha360(i,:)),'omitnan')-l_alpha360(i,q))/(3-sum(isnan(l_alpha360(i,:))));
+            alpha = l_alpha360(i,q) - (sum((l_alpha360(i,:)),'omitnan')-l_alpha360(i,q))/((size(maxima,1)-1)-sum(isnan(l_alpha360(i,:))));
         end
         if abs(alpha) > 67.5 & alpha_flag(i,q) ~=3
             alpha_flag(i,q)=1;
@@ -352,7 +352,7 @@ for i=1:timesteps-1
         dir(i)=sum(l_alpha360(i,:).*(alpha_flag(i,:)==0),'omitnan')/sum(alpha_flag(i,:)==0,'omitnan');
     else
         
-        for q=1:num_maxes
+        for q=1:(size(maxima,1))
             if l_alpha360(i,q) > 180
                 l_alpha360(i,q)= l_alpha360(i,q)-360;
             end

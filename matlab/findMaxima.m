@@ -1,4 +1,4 @@
-function [ maxima ] = findMaxima(maxima, nested_data,c_range,num_maxes)
+function [ maxima ] = findMaxima(maxima,nested_data,c_range,num_maxes,rain_threshold)
 %nested_data=nested_data(33:size(nested_data,1)-33,33:size(nested_data,1)-33,:);
 grid=size(nested_data,1);
 nested_data=reshape(nested_data,[grid*grid 1]);
@@ -29,8 +29,12 @@ for i=1:num_maxes-size(maxima,1)
         end
     end
     %maxima(i+1,1:3)=dummy(pot_points(end),:);
-    maxima=vertcat(maxima, dummy(pot_points(end),:));
-    dummy=dummy(pot_points,:);
-    clear pot_points
+    if dummy(pot_points(end),1)>rain_threshold
+        maxima=vertcat(maxima, dummy(pot_points(end),:));
+        dummy=dummy(pot_points,:);
+        clear pot_points
+    else 
+        return
+    end
 end
 
