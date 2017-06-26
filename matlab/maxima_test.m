@@ -6,7 +6,7 @@ res=100; % Aufloesung im m
 %grid=size(nested_data,1);
 grid=40000/res; % Gittergroesse
 c_range=50;
-num_maxes=4;
+num_maxes=8;
 
 N=grid;
 alpha = 1.7;
