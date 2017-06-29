@@ -50,22 +50,25 @@ R=zeros(333,360,timesteps);
 %transformation from polar to cartesian
 %scatteredinterpolant was rejected
 for i=1:timesteps
-    z(:,:,i)=10.^(data(:,:,i)/10);
-    for theta=1:360
-        for r=1:333
-            if data(r,theta,i)<=36.5
-                a=320;b=1.4;
-                R(r,theta,i)=(z(r,theta,i)/a)^(1/b);
-            elseif data(r,theta,i)> 36.5 & data(r,theta,i) <= 44.0
-                a=200;b=1.6;
-                R(r,theta,i)=(z(r,theta,i)/a)^(1/b);
-            else
-                a=77;b=1.9;
-                R(r,theta,i)=(z(r,theta,i)/a)^(1/b);
+    if min(min(data(:,:,i)))<0
+        z(:,:,i)=10.^(data(:,:,i)/10);
+        for theta=1:360
+            for r=1:333
+                if data(r,theta,i)<=36.5
+                    a=320;b=1.4;
+                    R(r,theta,i)=(z(r,theta,i)/a)^(1/b);
+                elseif data(r,theta,i)> 36.5 & data(r,theta,i) <= 44.0
+                    a=200;b=1.6;
+                    R(r,theta,i)=(z(r,theta,i)/a)^(1/b);
+                else
+                    a=77;b=1.9;
+                    R(r,theta,i)=(z(r,theta,i)/a)^(1/b);
+                end
+                
             end
-            
         end
     end
+    R(:,:,i)=data(:,:,i);
     %data(:,:,i)=0.0364633*(10.^(data(:,:,i)/10)).^0.625;
     data_car{i}= griddata(x,y,R(:,:,i),X,Y);
 end
