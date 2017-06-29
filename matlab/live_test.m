@@ -25,7 +25,8 @@ while true
 %             data=ncread('/home/zmaw/u300675/pattern_data/m4t_BKM_wrx00_l2_dbz_v00_20130426170000.nc','dbz_ac1');
 %             data=data(:,:,1:7);
             prog_data=rainprog_live(res,progtime,rain_threshold,data,num_maxes);
-            ncid=netcdf.create(strcat('/scratch/uni/u237/users/smichel/pattern_live/'),timeStamp,'.nc','CLOBBER');
+            data_name=strcat(timeStamp(1:2),'_',timeStamp(4:6),'_',timeStamp(8:11),'_',timeStamp(end-7:end-6),'_',timeStamp(end-4:end-3),'_',timeStamp(end-1:end));
+            ncid=netcdf.create(strcat('/scratch/uni/u237/users/smichel/pattern_live/'),n_timeStamp,'.nc','CLOBBER');
             dimidrow=netcdf.defDim(ncid,'rows',size(prog_data,1));
             dimidcol=netcdf.defDim(ncid,'clo',size(prog_data,2));
             dimidtime=netcdf.defDim(ncid,'time',size(prog_data,3));
