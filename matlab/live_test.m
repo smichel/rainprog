@@ -26,7 +26,7 @@ while true
 %             data=data(:,:,1:7);
             prog_data=rainprog_live(res,progtime,rain_threshold,data,num_maxes);
             data_name=strcat(timeStamp(1:2),'_',timeStamp(4:6),'_',timeStamp(8:11),'_',timeStamp(end-7:end-6),'_',timeStamp(end-4:end-3),'_',timeStamp(end-1:end));
-            ncid=netcdf.create(strcat('/scratch/uni/u237/users/smichel/pattern_live/'),n_timeStamp,'.nc','CLOBBER');
+            ncid=netcdf.create(strcat('/scratch/uni/u237/users/smichel/pattern_live/',data_name,'.nc'),'CLOBBER');
             dimidrow=netcdf.defDim(ncid,'rows',size(prog_data,1));
             dimidcol=netcdf.defDim(ncid,'clo',size(prog_data,2));
             dimidtime=netcdf.defDim(ncid,'time',size(prog_data,3));
