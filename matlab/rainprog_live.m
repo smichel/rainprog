@@ -176,7 +176,6 @@ for i=1:timesteps-1
             new_maxima(q,3)=maxima(q,3)-3*c_range+x_-1;
             
             
-            
             if alpha_flag(i,q)~=3
                 alpha_flag(i,q)=0;
             end
@@ -201,7 +200,8 @@ for i=1:timesteps-1
             new_maxima(q,1:3)=NaN;
         end
         
-    end
+     end
+    new_maxima_b{i}=new_maxima;
     maxima=new_maxima;
     maxima(isnan(maxima(:,1)),:)=[];
     maxima=findMaxima(maxima,nested_data(:,:,i+1),c_range,num_maxes,rain_threshold);
